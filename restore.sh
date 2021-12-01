@@ -1,9 +1,9 @@
 ﻿#!/bin/bash
 OCOD=/mnt/dbbackup/OCOD
 RCOD=/mnt/dbbackup/RCOD
-massive - select an array of hypervisor IP addresses depending on the contour
-restore - restoring a database from a database backup
-checkcopy - checking the existence of the entered date/time, when the backup was created
+#massive - select an array of hypervisor IP addresses depending on the contour
+#restore - restoring a database from a database backup
+#checkcopy - checking the existence of the entered date/time, when the backup was created
 massive()
 {
         local -n IP=$1
