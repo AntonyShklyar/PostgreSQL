@@ -30,22 +30,22 @@ massive()
 	local -n IP=$1
 	if [[ $(hostname | grep 01) ]]
 	then	
-        	IPIZ=(10.149.43.178 10.149.45.178)
-        	IPVN=(10.149.43.101 10.149.45.101)
-        	IPIN=(192.168.51.66 192.168.51.162)
+        	IPIZ=(10.111.13.178 10.111.15.178)
+        	IPVN=(10.111.23.101 10.149.25.101)
+        	IPIN=(10.111.33.66 10.111.35.162)
 	elif [[ $(hostname | grep 02) ]]
 	then
-		IPIZ=(10.149.45.178 10.149.43.178)
-       		IPVN=(10.149.45.101 10.149.43.101)
-      		IPIN=(192.168.51.162 192.168.51.66)
+		IPIZ=(10.111.15.178 10.111.13.178)
+       		IPVN=(10.149.25.101 10.111.23.101)
+      		IPIN=(10.111.35.162 10.111.33.66)
 	fi
         IP=()
-        if [[ $(hostname | grep vip) ]]
+        if [[ $(hostname | grep vn) ]]
         then
                 for t in ${IPVN[@]}; do
                         IP+=($t)
                 done
-        elif [[ $(hostname | grep auc) ]]; then
+        elif [[ $(hostname | grep iz) ]]; then
                 for t in ${IPIZ[@]}; do
                         IP+=($t)
                 done
@@ -79,7 +79,7 @@ backup()
 		rm -f $path/base.tar.gz
 	fi
 	#Determining an array of IP-addresses of servers with database clusters
-	IP=(s39aucbd1iz01 s39aucbd1iz02 s39aucbd2iz01 s39aucbd2iz02 s39auccrsvn01 s39auccrsvn02 s39auccrsin01 s39auccrsin02)
+	IP=(s39bd1iz01.iz.com s39bd1iz02.iz.com s39bd2iz01.iz.com s39bd2iz02.iz.com s39crsvn01.vn.com s39crsvn02.vn.com s39crsin01.in.com s39crsin02.in.com)
 	a=$(uname -n)
 	m=0
 	for i in ${IP[@]}
