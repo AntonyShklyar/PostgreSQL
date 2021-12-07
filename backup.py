@@ -4,6 +4,7 @@
 #backup - backup to the mounted spheres of the OCOD and RCOD
 #sync - synchronization of the contents of the mounted ball of the OCOD and RCOD
 #search - checking 'sync' trigger conditions
+#mounts - checking if the ball is mounted
 
 import os
 import shutil
