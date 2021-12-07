@@ -371,11 +371,7 @@ do
 				then
 					echo $(date +"%Y%m%d-%H%M%S")	Problems with the operation of the smbd service on the server with the repository of $(if [[ $(hostname | grep 01) ]]; then echo RCOD; elif [[ $(hostname | grep 02) ]]; then echo OCOD; fi)	>> /var/log/backupdb.log
 					exit
-				elif [[ $(mount | grep "//${my_array[0]}/bkp2/dbbackup/") && $CRESULT -eq 1 ]]; then
-					#Creating a backup copy to the backup storage because the main storage is unavailable
-					backup $var
-					exit
-				elif [[ -e $dir1/$bdarch ]]; then
+				elif [[ ($bdarch != '') && -e $dir1/$bdarch ]]; then
 					#Replication (copying of the created backup) to the backup storage
 					cp $dir1/$bdarch $dir2/ && echo $(date +"%Y%m%d-%H%M%S")	Replicating a PostgreSQL database backup to another data center storage Successfully 	>> /var/log/backupdb.log || echo $(date +"%Y%m%d-%H%M%S")        Replicating a PostgreSQL database backup to another data center storage Unsuccessfully       >> /var/log/backupdb.log
 					if [[ ! $(hostname | grep zbx) ]]; then cp $dir1/wal_$bdarch $dir2; fi
@@ -386,12 +382,8 @@ do
 					#Creating a backup copy in the backup storage, since there is no copy in the main storage
 					backup $var
 				fi
-			elif [[ $(mount | grep "//${my_array[0]}/bkp2/dbbackup/") && $CRESULT -eq 1 ]]; then
-				#Creating a backup copy to the backup storage because the main storage is unavailable
-				backup $var
-				exit
 			elif [[ $(mount | grep "//$g/bkp2/dbbackup/") && $CRESULT -eq 0 ]]; then
-				if [[ -e $dir1/$bdarch ]]
+				if [[ ($bdarch != '') && -e $dir1/$bdarch ]]
 				then
 					#Replication (copying of the created backup) to the backup storage
 					cp $dir1/$bdarch $dir2 && echo $(date +"%Y%m%d-%H%M%S")	Replicating a PostgreSQL database backup to another data center storage Successfully 	>> /var/log/backupdb.log || echo $(date +"%Y%m%d-%H%M%S")        Replicating a PostgreSQL database backup to another data center storage Unsuccessfully       >> /var/log/backupdb.log
