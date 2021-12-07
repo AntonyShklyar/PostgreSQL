@@ -3,6 +3,7 @@
 #massive - select an array of hypervisor IP addresses depending on the contour
 #restore - restoring a database from a database backup
 #checkcopy - checking the existence of the entered date/time, when the backup was created
+#mounts - checking if the ball is mounted
 
 import os
 import tarfile
