@@ -178,7 +178,6 @@ def backup(var):
                                 os.system('echo $(date +"%Y%m%d-%H%M%S") PostgreSQL DB is not running >> /var/log/backupdb.log')
                                 #Program termination due to inoperability of corosync and pacemaker services
                                 exit()
-#backup(1)
 def sync(a1, a2):
 	if a1==0:
 		var1='/mnt/dbbackup/OCOD/'
@@ -325,7 +324,12 @@ def search():
                                 sync(0,1)
                         elif c<d:
                                 sync(1,1)
-
+def mounts(g):
+	try:
+        	ls = subprocess.Popen(("mount"), stdout=subprocess.PIPE); mount = subprocess.check_output(("grep", g), stdin=ls.stdout); ls.wait(); n=5
+        except subprocess.CalledProcessError, e:
+        	n=1
+	return n
 var=0
 my_array=massive()
 for g in my_array:
@@ -345,27 +349,27 @@ for g in my_array:
                         #Mounting storages on a server with a database, if not mounted
                         #Checking the ability to write to storages mounted on a server with a database
                         exit_code = subprocess.call(["touch", dir1+'test'])
-			ls = subprocess.Popen(("mount"), stdout=subprocess.PIPE); mount = subprocess.check_output(("grep", g), stdin=ls.stdout); ls.wait();
-                        if not mount==0:
+			if mounts(g)==1:
                                 os.system('mount -a')
-                                if not os.system('mount -a')==0:
+                                if mounts(g)==1:
                                         os.system('echo $(date +"%Y%m%d-%H%M%S")   Problems with the operation of the smbd service on the server with the repository of $(if [[ $(hostname | grep 01) ]]; then echo OCOD; elif [[ $(hostname | grep 02) ]]; then echo RCOD; fi) >> /var/log/backupdb.log')
                                         continue
                                 else:
                                         os.system('echo $(date +"%y%m%d-%h%m%s")   PostgreSQL database backup storage is $(if [[ $(hostname | grep 01) ]]; then echo OCOD; elif [[ $(hostname | grep 02) ]]; then echo RCDO; fi) mounted successfully   >> /var/log/backupdb.log')
                                         bdarch=backup(1)
-                        elif mount == 0 and exit_code != 0:
+                        elif exit_code != 0:
                                 os.system('echo $(date +"%Y%m%d-%H%M%S")   Problems with the operation of the smbd service on the server with the repository of $(if [[ $(hostname | grep 01) ]]; then echo OCOD; elif [[ $(hostname | grep 02) ]]; then echo RCOD; fi) >> /var/log/backupdb.log')
                                 continue
-                        elif mount == 0 and exit_code == 0:
+                        elif exit_code == 0:
                                 bdarch=backup(1)
 	 	if var==2:
                         #Mounting storages on a server with a database, if not mounted
                         #Checking the ability to write to storages mounted on a server with a database
                         exit_code = subprocess.call(["touch", dir2+'test'])
                         ls = subprocess.Popen(("mount"), stdout=subprocess.PIPE); mount = subprocess.check_output(("grep", g), stdin=ls.stdout); ls.wait();
-			if not mount==0:
-                                if not os.system('mount -a')==0:
+			if mounts(g)==1:
+                                os.system('mount -a')
+                                if mounts(g)==1:
                                         os.system('echo $(date +"%Y%m%d-%H%M%S")   Problems with the operation of the smbd service on the server with the repository of $(if [[ $(hostname | grep 01) ]]; then echo RCOD; elif [[ $(hostname | grep 02) ]]; then echo OCOD; fi) >> /var/log/backupdb.log')
                                         exit()
                                 elif 'bdarch' in locals() and os.path.exists(dir1+bdarch)==1:
@@ -382,7 +386,7 @@ for g in my_array:
                                     os.system('echo $(date +"%y%m%d-%h%m%s")   PostgreSQL database backup storage is $(if [[ $(hostname | grep 01) ]]; then echo RCOD; elif [[ $(hostname | grep 02) ]]; then echo OCOD; fi) mounted successfully   >> /var/log/backupdb.log')
                                         #Creating a backup copy in the backup storage, since there is no copy in the main storage
                                     backup(2)
-                        elif mount == 0 and exit_code != 0:
+                        elif exit_code != 0:
                                 #Creating a backup copy to the backup storage because the main storage is unavailable
                                 exit()
                         elif 'bdarch' in locals() and os.path.exists(dir1+bdarch)==1:
