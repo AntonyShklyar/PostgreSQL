@@ -5,6 +5,20 @@
 #sync - synchronization of the contents of the mounted ball of the OCOD and RCOD
 #search - checking 'sync' trigger conditions
 
+:<<end_of_comments
+BD clusters:
+s39bd1iz01.iz.com
+s39bd1iz02.iz.com
+s39bd2iz01.iz.com
+s39bd2iz02.iz.com
+and
+s39crsvn01.vn.com
+s39crsvn02.vn.com
+and
+s39crsin01.in.com 
+s39crsin02.in.com
+end_of_comments
+
 #Creating a log file for long-term storage of script events
 if [[ ! -f /var/log/debugdb.log ]]; then touch /var/log/debugdb.log; chmod 666 /var/log/debugdb.log; fi
 #If the size of 1 GB is exceeded, the debug.log is deleted and recreated
