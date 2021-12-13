@@ -62,7 +62,7 @@ checkcopy()
                 echo "Backup list $path1"
                 ls -l $path1
                 echo
-                echo "Backup list $path1"
+                echo "Backup list $path2"
                 ls -l $path2
                 echo
         else
