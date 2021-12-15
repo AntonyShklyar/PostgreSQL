@@ -215,7 +215,6 @@ def mountavailable(var, g):
                     return 0
 m=0
 var=0
-a=socket.gethostname()
 my_array=massive()
 for g in my_array:
         var += 1
