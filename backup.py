@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-if false:
-        BD clusters:
-        s39bd1iz01.iz.com
+'''
+BD clusters:
+    	s39bd1iz01.iz.com
         s39bd1iz02.iz.com
         s39bd2iz01.iz.com
         s39bd2iz02.iz.com
@@ -12,7 +12,7 @@ if false:
         and
         s39crsin01.in.com
         s39crsin02.in.com
-	
+'''	
 #massive - selection of an array of hypervisor IP addresses depending on the contour
 #backup - backup to the mounted spheres of the OCOD and RCOD
 #sync - synchronization of the contents of the mounted ball of the OCOD and RCOD
