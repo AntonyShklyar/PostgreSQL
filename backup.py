@@ -38,10 +38,10 @@ def massive(IP=[]):
         	IPIZ = ['10.111.15.63', '10.111.15.54']
                 IPVN = ['10.111.16.63', '10.111.16.54']
                 IPIN = ['10.111.17.63', '10.111.17.54']	
-	if set('vp').issubset(socket.gethostname()):
+	if socket.gethostname().find('vp.com') >= 0:
 		for i in IPVN:
 			IP.append(i)
-	elif set('ac').issubset(socket.gethostname()):
+	elif socket.gethostname().find('ac.com') >= 0:
                 for i in IPIZ:
                         IP.append(i)
 	else:
@@ -138,7 +138,7 @@ def backup(var):
                         	os.system('echo $(date +"%Y%m%d-%H%M%S")     An incorrectly created backup copy of the database has been deleted $( if [[ ($var = 1) && $(hostname | grep 01) ]]; then echo OCOD; elif [[ ($var = 1) && $(hostname | grep 02) ]]; then echo RCOD; elif [[ ($var = 2) && $(hostname | grep 01) ]]; then echo OCOD; elif [[ ($var = 2) && $(hostname | grep 02) ]]; then echo RCOD; fi) >> /var/log/backupdb.log')
                         	#Program termination due to disconnection of corosync and pacemaker services during backup creation
                         	exit()
-                	elif not set('zbx').issubset(socket.gethostname()):
+                	elif socket.gethostname().find('zbx') < 0:
                 		pipe=os.popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz')
                         	bdarch=pipe.read()
                         	bdarch=bdarch.replace("\n","")
@@ -164,7 +164,7 @@ def backup(var):
                         	os.system('echo $(date +"%Y%m%d-%H%M%S")     An incorrectly created backup copy of the database has been deleted $( if [[ ($var = 1) && $(hostname | grep 01) ]]; then echo OCOD; elif [[ ($var = 1) && $(hostname | grep 02) ]]; then echo RCOD; elif [[ ($var = 2) && $(hostname | grep 01) ]]; then echo OCOD; elif [[ ($var = 2) && $(hostname | grep 02) ]]; then echo RCOD; fi) >> /var/log/backupdb.log')
                         	#Program termination due to disconnection of corosync and pacemaker services during backup creation
                         	exit()
-                	elif not set('zbx').issubset(socket.gethostname()):
+                	elif socket.gethostname().find('zbx') < 0:
 				pipe=os.popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz')
                         	bdarch=pipe.read()
                         	bdarch=bdarch.replace("\n","")
