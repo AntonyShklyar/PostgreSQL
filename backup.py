@@ -61,7 +61,6 @@ def massive(IP=[]):
 		for i in IPIN:
                         IP.append(i)
 	return IP
-#massive()
 def backup(var):
 	if not os.path.isdir('/var/lib/postgresql/wal_archive/'): os.mkdir('/var/lib/postgresql/wal_archive/'); uid = pwd.getpwnam("postgres").pw_uid; os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
 	if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
