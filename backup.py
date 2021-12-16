@@ -336,8 +336,8 @@ my_array=massive()
 for g in my_array:
         var += 1
         #Checking the availability of hypervisor servers with ICMP backup storages
-	mount = subprocess.Popen(("ping", "-c4", g), stdout=subprocess.PIPE); exit_code = subprocess.check_output(("sed", "-n", '1,/^---/d;s/%.*//;s/.*, //g;p;q'), stdin=mount.stdout); mount.wait();
-        if exit_code==1:
+	mount = subprocess.Popen(("ping", "-c4", g), stdout=subprocess.PIPE); exit_code = subprocess.check_output(("sed", "-n", '1,/^---/d;s/%.*//;s/.*, //g;p;q'), stdin=mount.stdout); mount.wait()
+        if int(exit_code.replace("\n","")) == 100:
                 if var==1:
                         os.system('echo $(date +"%Y%m%d-%H%M%S")     Server with storage $(if [[ $(hostname | grep 01) ]]; then echo OCOD; elif [[ $(hostname | grep 02) ]]; then echo RCOD; fi) is not available       >> /var/log/backupdb.log')
                         continue
