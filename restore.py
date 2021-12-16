@@ -2,20 +2,19 @@
 
 #Added the ability to restore from a backup of any cluster server
 
-:<<end_of_comments
-BD clusters:
-s39bd1iz01.iz.com
-s39bd1iz02.iz.com
-s39bd2iz01.iz.com
-s39bd2iz02.iz.com
-and
-s39crsvn01.vn.com
-s39crsvn02.vn.com
-and
-s39crsin01.in.com
-s39crsin02.in.com
-end_of_comments
-
+if false:
+        BD clusters:
+        s39bd1iz01.iz.com
+        s39bd1iz02.iz.com
+        s39bd2iz01.iz.com
+        s39bd2iz02.iz.com
+        and
+        s39crsvn01.vn.com
+        s39crsvn02.vn.com
+        and
+        s39crsin01.in.com
+        s39crsin02.in.com
+        
 #massive - select an array of hypervisor IP addresses depending on the contour
 #restore - restoring a database from a database backup
 #checkcopy - checking the existence of the entered date/time, when the backup was created
