@@ -64,30 +64,18 @@ def massive(IP=[]):
 def backup(var):
 	IP=['s39bd1iz01.ac.com', 's39bd1iz02.ac.com', 's39bd2iz01.ac.com', 's39bd2iz02.ac.com', 's39crsvn01.vp.com', 's39crsvn02.vp.com', 's39crsin01.in.com', 's39ccrsin02.in.com']
 	a=socket.gethostname()
-	m=0
 	for i in IP:
 		m=1
-		if a==i:
+		if i==a:
 			if not os.path.isdir('/var/lib/postgresql/wal_archive/'): os.mkdir('/var/lib/postgresql/wal_archive/'); uid = pwd.getpwnam("postgres").pw_uid; os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
 			if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'+a
 			elif var==1 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'+a
 			elif var==2 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'+a
 			elif var==2 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'+a
+			if os.path.exists(path + 'temp/' + 'base.tar.gz'): os.remove(path + 'temp/' + 'base.tar.gz'
 			statcor=os.system('systemctl status corosync')
 			statpace=os.system('systemctl status pacemaker')
-		elif m<len(IP):
-			continue
-		elif m=len(IP):
-			if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
-			elif var==1 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
-			elif var==2 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
-			elif var==2 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
-	if os.path.exists(path + 'temp/' + 'base.tar.gz'): os.remove(path + 'temp/' + 'base.tar.gz'
-        m=0
-	for i in IP:
-		m=1
-		if i==a:
-			if statcor==0 and statpace==0:
+			if statcor==0 and statpace=0:
                                 if var==1:
 					start_time = time.time()
 					exit_code = os.system('sudo su - postgres -c "pg_basebackup -D /mnt/dbbackup/OCOD/temp -Ft -z -Z 9 -P --xlog"')
@@ -144,6 +132,11 @@ def backup(var):
                                 os.system('echo $(date +"%Y%m%d-%H%M%S") PostgreSQL DB is not running >> /var/log/backupdb.log')
                                 #Program termination due to inoperability of corosync and pacemaker services
                                 exit()
+	if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
+	elif var==1 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
+	elif var==2 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
+	elif var==2 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
+	if os.path.exists(path + 'temp/' + 'base.tar.gz'): os.remove(path + 'temp/' + 'base.tar.gz'						     
 	postgre=os.system('systemctl status postgresql')
 	if postgre==0:
 		if var==1:
