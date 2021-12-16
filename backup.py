@@ -30,7 +30,7 @@ import time
 import datetime
 
 #Creating a log file for long-term storage of script events
-if not os.path.exists('/var/log/debugdb.log'): open("/var/log/debugdb.log", "w+")
+open("/var/log/debugdb.log", "w+")
 #If the size of 1 GB is exceeded, the debug.log is deleted and recreated
 if not os.path.getsize('/var/log/debugdb.log')/(1024*1024*1024)==0: os.remove('/var/log/debugdb.log')
 shutil.copyfile("/var/log/backupdb.log", "/var/log/debugdb.log") 
@@ -62,17 +62,28 @@ def massive(IP=[]):
                         IP.append(i)
 	return IP
 def backup(var):
-	if not os.path.isdir('/var/lib/postgresql/wal_archive/'): os.mkdir('/var/lib/postgresql/wal_archive/'); uid = pwd.getpwnam("postgres").pw_uid; os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
-	if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
-	elif var==1 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
-	elif var==2 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
-	elif var==2 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
-	if os.path.exists(path + 'temp/' + 'base.tar.gz'): os.remove(path + 'temp/' + 'base.tar.gz')
 	IP=['s39bd1iz01.ac.com', 's39bd1iz02.ac.com', 's39bd2iz01.ac.com', 's39bd2iz02.ac.com', 's39crsvn01.vp.com', 's39crsvn02.vp.com', 's39crsin01.in.com', 's39ccrsin02.in.com']
-        a=socket.gethostname()
+	a=socket.gethostname()
+	m=0
+	for i in IP:
+		m=1
+		if a==i:
+			if not os.path.isdir('/var/lib/postgresql/wal_archive/'): os.mkdir('/var/lib/postgresql/wal_archive/'); uid = pwd.getpwnam("postgres").pw_uid; os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
+			if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'+a
+			elif var==1 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'+a
+			elif var==2 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'+a
+			elif var==2 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'+a
+			statcor=os.system('systemctl status corosync')
+			statpace=os.system('systemctl status pacemaker')
+		elif m<len(IP):
+			continue
+		elif m=len(IP):
+			if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
+			elif var==1 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
+			elif var==2 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
+			elif var==2 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
+	if os.path.exists(path + 'temp/' + 'base.tar.gz'): os.remove(path + 'temp/' + 'base.tar.gz'
         m=0
-	statcor=os.system('systemctl status corosync')
-	statpace=os.system('systemctl status pacemaker')
 	for i in IP:
 		m=1
 		if i==a:
