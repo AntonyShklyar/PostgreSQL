@@ -1,9 +1,8 @@
 #!/usr/bin/python
 
 #Added the ability to restore from a backup of any cluster server
-
-if false:
-        BD clusters:
+'''
+BD clusters:
         s39bd1iz01.iz.com
         s39bd1iz02.iz.com
         s39bd2iz01.iz.com
@@ -14,7 +13,7 @@ if false:
         and
         s39crsin01.in.com
         s39crsin02.in.com
-        
+'''       
 #massive - select an array of hypervisor IP addresses depending on the contour
 #restore - restoring a database from a database backup
 #checkcopy - checking the existence of the entered date/time, when the backup was created
