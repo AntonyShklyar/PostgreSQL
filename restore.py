@@ -34,10 +34,10 @@ def massive(IP=[]):
                 IPIZ = ['10.111.15.63', '10.111.15.54']
                 IPVN = ['10.111.16.63', '10.111.16.54']
                 IPIN = ['10.111.17.63', '10.111.17.54']
-        if socket.gethostname().find('vn.com') < 0:
+        if socket.gethostname().find('vn.com') > 0:
                 for i in IPVN:
                         IP.append(i)
-        elif socket.gethostname().find('iz.com'):
+        elif socket.gethostname().find('iz.com') > 0:
                 for i in IPIZ:
                         IP.append(i)
         else:
