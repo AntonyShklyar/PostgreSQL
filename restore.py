@@ -152,8 +152,8 @@ def input(var,n):
         except KeyError:
             print('Invalid value entered. Try again'); input(var, n)
 def networkavailable(var, g):
-        mount = subprocess.Popen(("ping", "-c4", g), stdout=subprocess.PIPE); exit_code = subprocess.check_output(("sed", "-n", '1,/^---/d;s/%.*//;s/.*, //g;p;q'), stdin=mount.stdout); mount.wait();
-        if exit_code==1:
+        mount = subprocess.Popen(("ping", "-c4", g), stdout=subprocess.PIPE); exit_code = subprocess.check_output(("sed", "-n", '1,/^---/d;s/%.*//;s/.*, //g;p;q'), stdin=mount.stdout); mount.wait()
+        if int(exit_code.replace("\n","")) == 100:
                 if var==1:
                         os.system('echo $(date +"%Y%m%d-%H%M%S")     Server with storage OCOD is not available       >> /var/log/backupdb.log')
                         return 1
