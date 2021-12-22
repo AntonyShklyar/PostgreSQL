@@ -94,14 +94,13 @@ def backup(var):
                                         #Program termination due to disconnection of corosync and pacemaker services during backup creation
                                         	exit()
                                         else:
-                                                pipe=os.popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz')
-                                                bdarch=pipe.read()
-                                                bdarch=bdarch.replace("\n","")
+						b=subprocess.Popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz', shell=True, stdout=subprocess.PIPE); bdarch = subprocess.check_output(('xargs', 'echo'),stdin=b.stdout).split("\n")[0]; b.wait() 
                                                 os.rename(path + '/temp/' + 'base.tar.gz', path + '/temp/' + bdarch)
                                                 os.rename(path + '/temp/' + bdarch, path + bdarch)
                                                 os.system('sleep 15m')
                                                 shutil.rmtree('/tmp/wal', ignore_errors=True)
                                                 os.mkdir('/tmp/wal')
+						subprocess.call(["find", "/var/lib/postgresql/wal_archive/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
                                                 subprocess.call(["find", "/var/lib/postgresql/9.6/main/pg_xlog/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
                                                 return bdarch
 			elif not (statcor==0 and statpace==0):
