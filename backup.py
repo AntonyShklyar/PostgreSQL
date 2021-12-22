@@ -85,13 +85,12 @@ def backup(var):
                                             os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Successful >> /var/log/backupdb.log')
                                         else:
                                             os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Unsuccessful >> /var/log/backupdb.log')
-					    return 1
                                         TIME='-' + str(round(((time.time() - start_time)/60)+30)).split('.')[0]                                	
 					if not (statcor==0 and statpace==0):
                                         	os.system('echo $(date +"%Y%m%d-%H%M%S") PostgreSQL DB is not running >> /var/log/backupdb.log')
                                         #Deleting an incorrectly created backup due to the disabling of corosync and pacemaker services during the creation of the backup
                                         	os.remove(path + '/temp/' + 'base.tar.gz')
-						os.system('echo $(date +"%Y%m%d-%H%M%S")     An incorrectly created backup copy of the database has been deleted $( if [[ ($var = 1) && $(hostname | grep 01) ]]; then echo OCOD; elif [[ ($var = 1) && $(hostname | grep 02) ]]; then echo RCOD; elif [[ ($var = 2) && $(hostname | grep 01) ]]; then echo OCOD; elif [[ ($var = 2) && $(hostname | grep 02) ]]; then echo RCOD; fi) >> /var/log/backupdb.log')
+						subprocess.call('echo $(date +"%Y%m%d-%H%M%S") An incorrectly created backup copy of the database has been deleted $( if [[ $(hostname | grep 01) ]]; then echo OCOD; elif [[ $(hostname | grep 02) ]]; then echo RCOD; fi) >> /var/log/backupdb.log', shell=True)
                                         #Program termination due to disconnection of corosync and pacemaker services during backup creation
                                         	exit()
                                         else:
@@ -126,7 +125,6 @@ def backup(var):
                             os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Successful >> /var/log/backupdb.log')
                         else:
                             os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Unsuccessful >> /var/log/backupdb.log')
-			    return 1
                         TIME='-' + str(round(((time.time() - start_time)/60)+30)).split('.')[0]
                 	if not postgre==0:
                 		os.system('echo $(date +"%Y%m%d-%H%M%S") PostgreSQL DB is not running >> /var/log/backupdb.log')
