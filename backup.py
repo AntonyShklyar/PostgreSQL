@@ -22,12 +22,10 @@ BD clusters:
 import os
 import shutil
 import socket
-import numpy as np
 import pwd
 import grp
 import subprocess
-import time
-import datetime
+from datetime import datetime
 
 #Creating a log file for long-term storage of script events
 open("/var/log/debugdb.log", "w+")
@@ -78,15 +76,16 @@ def backup(var):
 					start_time = time.time()
 					process=subprocess.Popen(["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setuid(116)).wait();
                                         if process==0:
-                                            os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Successful >> /var/log/backupdb.log')
+					    with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Successful'+'\n')
                                         else:
-                                            os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Unsuccessful >> /var/log/backupdb.log')
+                                            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Unsuccessful'+'\n')
                                         TIME='-' + str(round(((time.time() - start_time)/60)+30)).split('.')[0]                                	
 					if not (statcor==0 and statpace==0):
-                                        	os.system('echo $(date +"%Y%m%d-%H%M%S") PostgreSQL DB is not running >> /var/log/backupdb.log')
+						with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
                                         #Deleting an incorrectly created backup due to the disabling of corosync and pacemaker services during the creation of the backup
                                         	os.remove(path + '/temp/' + 'base.tar.gz')
-						subprocess.call('echo $(date +"%Y%m%d-%H%M%S") An incorrectly created backup copy of the database has been deleted $( if [[ $(hostname | grep 01) ]]; then echo OCOD; elif [[ $(hostname | grep 02) ]]; then echo RCOD; fi) >> /var/log/backupdb.log', shell=True)
+						test='OCOD' if set('01').issubset(socket.gethostname()) else 'RCOD'
+						with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' An incorrectly created backup copy of the database has been deleted'+test+'\n')
                                         #Program termination due to disconnection of corosync and pacemaker services during backup creation
                                         	exit()
                                         else:
@@ -100,7 +99,7 @@ def backup(var):
                                                 subprocess.call(["find", "/var/lib/postgresql/9.6/main/pg_xlog/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
                                                 return bdarch
 			elif not (statcor==0 and statpace==0):
-                                os.system('echo $(date +"%Y%m%d-%H%M%S") PostgreSQL DB is not running >> /var/log/backupdb.log')
+				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
                                 #Program termination due to inoperability of corosync and pacemaker services
                                 exit()
 	if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
@@ -113,15 +112,16 @@ def backup(var):
 			start_time = time.time()
 			process=subprocess.Popen(["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setuid(116)).wait();
                         if process==0:
-                            os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Successful >> /var/log/backupdb.log')
+			    with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Successful'+'\n')
                         else:
-                            os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Unsuccessful >> /var/log/backupdb.log')
+                            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Unsuccessful'+'\n')
                         TIME='-' + str(round(((time.time() - start_time)/60)+30)).split('.')[0]
                 	if not postgre==0:
-                		os.system('echo $(date +"%Y%m%d-%H%M%S") PostgreSQL DB is not running >> /var/log/backupdb.log')
+				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
                    		#Deleting an incorrectly created backup due to the disabling of corosync and pacemaker services during the creation of the backup
                         	os.remove(path + 'base.tar.gz')
-                        	os.system('echo $(date +"%Y%m%d-%H%M%S")     An incorrectly created backup copy of the database has been deleted $( if [[ ($var = 1) && $(hostname | grep 01) ]]; then echo OCOD; elif [[ ($var = 1) && $(hostname | grep 02) ]]; then echo RCOD; elif [[ ($var = 2) && $(hostname | grep 01) ]]; then echo OCOD; elif [[ ($var = 2) && $(hostname | grep 02) ]]; then echo RCOD; fi) >> /var/log/backupdb.log')
+                        	test='OCOD' if set('01').issubset(socket.gethostname()) else 'RCOD'
+				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' An incorrectly created backup copy of the database has been deleted'+test+'\n')
                         	#Program termination due to disconnection of corosync and pacemaker services during backup creation
                         	exit()
                 	elif socket.gethostname().find('zbx') < 0:
@@ -134,7 +134,7 @@ def backup(var):
                         	subprocess.call(["find", "/var/lib/postgresql/9.6/main/pg_xlog/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
                         	return bdarch
 	elif not postgres==0:
-                                os.system('echo $(date +"%Y%m%d-%H%M%S") PostgreSQL DB is not running >> /var/log/backupdb.log')
+				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
                                 #Program termination due to inoperability of corosync and pacemaker services
                                 exit()
 def sync(a1, a2):
@@ -201,9 +201,9 @@ def sync(a1, a2):
                                 elif e==len(b):
 					exit_code = subprocess.call(['cp', var2+j, var1])
 					if exit_code==0: 
-						os.system('echo $(date +"%Y%m%d-%H%M%S")     Synchronization of archive $(echo $j) of the backup copy of the DB PostgreSQL RCOD and OCOD Successfully >> /var/log/backupdb.log')
+						with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Synchronization of archive '+j+' of the backup copy of the DB PostgreSQL RCOD and OCOD Successfully'+'\n')
 					else:
-						os.system('echo $(date +"%Y%m%d-%H%M%S")     Synchronization of archive $(echo $j) of the backup copy of the DB PostgreSQL RCOD and OCOD Unsuccessfully >> /var/log/backupdb.log')	
+						with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Synchronization of archive '+j+' of the backup copy of the DB PostgreSQL RCOD and OCOD Unsuccessfully'+'\n')	
 			else:
 				exit_code = subprocess.call(['diff', var2+j, var1+k])
 				if not exit_code==0:
@@ -212,10 +212,10 @@ def sync(a1, a2):
                                 	break
                                 else:
 					exit_code = subprocess.call(['cp', var2+j, var1])
-					if exit_code==0:
-                                                os.system('echo $(date +"%Y%m%d-%H%M%S")     Synchronization of archive $(echo $j) of the backup copy of the DB PostgreSQL RCOD and OCOD Successfully >> /var/log/backupdb.log')
-                                        else:
-                                                os.system('echo $(date +"%Y%m%d-%H%M%S")     Synchronization of archive $(echo $j) of the backup copy of the DB PostgreSQL RCOD and OCOD Unsuccessfully >> /var/log/backupdb.log')
+					if exit_code==0: 
+						with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Synchronization of archive '+j+' of the backup copy of the DB PostgreSQL RCOD and OCOD Successfully'+'\n')
+					else:
+						with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Synchronization of archive '+j+' of the backup copy of the DB PostgreSQL RCOD and OCOD Unsuccessfully'+'\n')
 					if len(b)==1: break
                                         b.remove(k)
                                         break
