@@ -262,7 +262,7 @@ def search():
 	ls = subprocess.Popen(("ls", "/mnt/dbbackup/RCOD/"), stdout=subprocess.PIPE); c = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait(); c=len(c.splitlines())
         ls = subprocess.Popen(("ls", "/mnt/dbbackup/OCOD/"), stdout=subprocess.PIPE); d = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait(); d=len(d.splitlines())
 	for i in range(2):
-		if i==1 and set('zbx').issubset(socket.gethostname()): break
+		if i==1 and socket.gethostname().find('zbx') >= 0: break
                 if i==0:
                         if a==b: 
 				continue
