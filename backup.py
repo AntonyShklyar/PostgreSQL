@@ -76,12 +76,8 @@ def backup(var):
 			statpace=os.system('systemctl status pacemaker')
 			if statcor==0 and statpace=0:
 					start_time = time.time()
-					def my_preexec_fn():
-        					os.setuid(116)
-					cmdstr = ["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"]
-					process = subprocess.Popen(cmdstr,stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=my_preexec_fn)
-					code = process.wait()
-                                        if code==0:
+					process=subprocess.Popen(["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setuid(116)).wait();
+                                        if process==0:
                                             os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Successful >> /var/log/backupdb.log')
                                         else:
                                             os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Unsuccessful >> /var/log/backupdb.log')
@@ -115,12 +111,8 @@ def backup(var):
 	postgre=os.system('systemctl status postgresql')
 	if postgre==0:
 			start_time = time.time()
-			def my_preexec_fn():
-        				os.setuid(116)
-			cmdstr = ["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"]
-			process = subprocess.Popen(cmdstr,stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=my_preexec_fn)
-			code = process.wait()
-                        if code==0:
+			process=subprocess.Popen(["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setuid(116)).wait();
+                        if process==0:
                             os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Successful >> /var/log/backupdb.log')
                         else:
                             os.system('echo $(date +"%Y%m%d-%H%M%S")     PostgreSQL Database Backup Unsuccessful >> /var/log/backupdb.log')
@@ -133,9 +125,7 @@ def backup(var):
                         	#Program termination due to disconnection of corosync and pacemaker services during backup creation
                         	exit()
                 	elif socket.gethostname().find('zbx') < 0:
-                		pipe=os.popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz')
-                        	bdarch=pipe.read()
-                        	bdarch=bdarch.replace("\n","")
+                		b=subprocess.Popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz', shell=True, stdout=subprocess.PIPE); bdarch = subprocess.check_output(('xargs', 'echo'),stdin=b.stdout).split("\n")[0]; b.wait()
                         	os.rename(path + 'temp/' + 'base.tar.gz', path + 'temp/' + bdarch)
                                 os.rename(path + 'temp/' + bdarch, path + bdarch)
                         	os.system('sleep 15m')
@@ -163,46 +153,38 @@ def sync(a1, a2):
                 		var2='/mnt/dbbackup/RCOD/'
 	if a1==0:					     
 		if a2==0:
-			ls = subprocess.Popen(("ls", "-rI", "wal*", var2), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait()
-			a=a.split("\n")
+			ls = subprocess.Popen(("ls", "-rI", "wal*", var2), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout).split("\n"); ls.wait()
 			for i in a: 
 				if i==a[len(a)-1]: a.remove(i)
-			ls = subprocess.Popen(("ls", "-rI", "wal*", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait() 
-			b=b.split("\n")
+			ls = subprocess.Popen(("ls", "-rI", "wal*", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout).split("\n"); ls.wait() 
                         for i in b:
                                 if i==b[len(b)-1]: b.remove(i)
 			ls = subprocess.Popen(("ls", "-rI", "wal*", var1), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait(); c=len(output.splitlines())
 			ls = subprocess.Popen(("ls", "-rI", "wal*", var2), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait(); d=len(output.splitlines())
                 else:
-			ls = subprocess.Popen(("ls", "-t", var2), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait()
-			a=a.split("\n")
+			ls = subprocess.Popen(("ls", "-t", var2), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout).split("\n"); ls.wait()
                         for i in a:
                                 if i==a[len(a)-1]: a.remove(i)
-			ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait()
-			b=b.split("\n")
+			ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout).split("\n"); ls.wait()
                         for i in b:
                                 if i==b[len(b)-1]: b.remove(i)
 			ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait(); c=len(output.splitlines())
 			ls = subprocess.Popen(("ls", "-t", var2), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait(); d=len(output.splitlines())
         else:
                 if a2==0:
-                        ls = subprocess.Popen(("ls", "-rI", "wal*", var1), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait()
-			a=a.split("\n")
+                        ls = subprocess.Popen(("ls", "-rI", "wal*", var1), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout).split("\n"); ls.wait()
                         for i in a:
                                 if i==a[len(a)-1]: a.remove(i)
-			ls = subprocess.Popen(("ls", "-rI", "wal*", var2), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait() 
-			b=b.split("\n")
+			ls = subprocess.Popen(("ls", "-rI", "wal*", var2), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout).split("\n"); ls.wait() 
                         for i in b:
                                 if i==b[len(b)-1]: b.remove(i)
 			ls = subprocess.Popen(("ls", "-rI", "wal*", var2), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait(); c=len(output.splitlines())
 			ls = subprocess.Popen(("ls", "-rI", "wal*", var1), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait(); d=len(output.splitlines())
                 else:
-			ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait()
-			a=a.split("\n")
+			ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout).split("\n"); ls.wait()
                         for i in a:
                                 if i==a[len(a)-1]: a.remove(i)
-			ls = subprocess.Popen(("ls", "-t", var2), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait()
-			b=b.split("\n")
+			ls = subprocess.Popen(("ls", "-t", var2), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout).split("\n"); ls.wait()
                         for i in b:
                                 if i==b[len(b)-1]: b.remove(i)
 			ls = subprocess.Popen(("ls", "-t", var2), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait(); c=len(output.splitlines())
@@ -239,27 +221,23 @@ def sync(a1, a2):
                                         break
 	if a1==1:
 		if a2==0:
-			ls = subprocess.Popen(("ls", "-rI", "wal*", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait()
-			b=b.split("\n")
+			ls = subprocess.Popen(("ls", "-rI", "wal*", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout).split("\n"); ls.wait()
                         for i in b:
                                	if i==b[len(b)-1]: b.remove(i)
 			ls = subprocess.Popen(("ls", "-I", "wal*", var1), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait(); c=len(output.splitlines())
 		else:
-			ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait()
-			b=b.split("\n")
+			ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout).split("\n"); ls.wait()
                         for i in b:
                                 if i==b[len(b)-1]: b.remove(i)
 			ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait(); c=len(output.splitlines())
         else:
 		if a2==0:
-                        ls = subprocess.Popen(("ls", "-rI", "wal*", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait()
-                        b=b.split("\n")
+                        ls = subprocess.Popen(("ls", "-rI", "wal*", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout).split("\n"); ls.wait()
                         for i in b:
                                 if i==b[len(b)-1]: b.remove(i)
                         ls = subprocess.Popen(("ls", "-I", "wal*", var1), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); ls.wait(); c=len(output.splitlines())
                 else:
-                        ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait()
-                        b=b.split("\n")
+                        ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout).split("\n"); ls.wait()
                         for i in b:
                                 if i==b[len(b)-1]: b.remove(i)
                         ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); output = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait(); c=len(output.splitlines())
