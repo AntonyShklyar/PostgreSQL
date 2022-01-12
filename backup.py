@@ -45,15 +45,16 @@ def massive(IP=[]):
                 IPVN = ['10.111.16.63', '10.111.16.54']
                 IPIN = ['10.111.17.63', '10.111.17.54']	
 	if socket.gethostname().find('vp.com') >= 0:
-		[IP.append(i) for i in IPVN]
+		[IP.insert(0,i) for i in IPVN]
 	elif socket.gethostname().find('ac.com') >= 0:
-                [IP.append(i) for i in IPIZ]
+                [IP.insert(0,i) for i in IPIZ]
 	else:
-		[IP.append(i) for i in IPIN] 
+		[IP.insert(0,i) for i in IPIN] 
 	return IP
 def backup(var):
 	IP=['s39bd1iz01.ac.com', 's39bd1iz02.ac.com', 's39bd2iz01.ac.com', 's39bd2iz02.ac.com', 's39crsvn01.vp.com', 's39crsvn02.vp.com', 's39crsin01.in.com', 's39ccrsin02.in.com']
 	a=socket.gethostname()
+	b=len(IP)-1
 	for i in IP:
 		if i==a:
 			if not os.path.isdir('/var/lib/postgresql/wal_archive/'): os.mkdir('/var/lib/postgresql/wal_archive/'); uid = pwd.getpwnam("postgres").pw_uid; os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
@@ -64,73 +65,47 @@ def backup(var):
 			if os.path.exists(path + '/temp/' + 'base.tar.gz'): os.remove(path + '/temp/' + 'base.tar.gz')
 			statcor=os.system('systemctl status corosync')
 			statpace=os.system('systemctl status pacemaker')
-			stat
-			if (statcor==0 and statpace=0) or :
-					start_time = time.time()
-					process=subprocess.Popen(["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setuid(116)).wait();
-                                        if process==0:
-					    with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Successful'+'\n')
-                                        else:
-                                            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Unsuccessful'+'\n')
-					    return 1
-                                        TIME='-' + str(round(((time.time() - start_time)/60)+30)).split('.')[0]                                	
-					if not (statcor==0 and statpace==0):
-						with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
-                                                #Deleting an incorrectly created backup due to the disabling of corosync and pacemaker services during the creation of the backup
-                                        	os.remove(path + '/temp/' + 'base.tar.gz')
-						test='OCOD' if set('01').issubset(socket.gethostname()) else 'RCOD'
-						with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' An incorrectly created backup copy of the database has been deleted'+test+'\n')
-                                        #Program termination due to disconnection of corosync and pacemaker services during backup creation
-                                        	exit()
-                                        else:
-						b=subprocess.Popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz', shell=True, stdout=subprocess.PIPE); bdarch = subprocess.check_output(('xargs', 'echo'),stdin=b.stdout).split("\n")[0]; b.wait() 
-                                                os.rename(path + '/temp/' + 'base.tar.gz', path + '/temp/' + bdarch)
-                                                os.rename(path + '/temp/' + bdarch, path + bdarch)
-                                                os.system('sleep 15m')
-                                                shutil.rmtree('/tmp/wal', ignore_errors=True)
-                                                os.mkdir('/tmp/wal')
-						subprocess.call(["find", "/var/lib/postgresql/wal_archive/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
-                                                subprocess.call(["find", "/var/lib/postgresql/9.6/main/pg_xlog/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
-                                                return bdarch
-			elif not (statcor==0 and statpace==0):
-				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
-                                #Program termination due to inoperability of corosync and pacemaker services
-                                exit()
-	if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
-	elif var==1 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
-	elif var==2 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
-	elif var==2 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
-	if os.path.exists(path + 'temp/' + 'base.tar.gz'): os.remove(path + 'temp/' + 'base.tar.gz'						     
-	postgre=os.system('systemctl status postgresql')
-	if postgre==0:
-			start_time = time.time()
-			process=subprocess.Popen(["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setuid(116)).wait();
-                        if process==0:
-			    with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Successful'+'\n')
-                        else:
-                            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Unsuccessful'+'\n')
-                        TIME='-' + str(round(((time.time() - start_time)/60)+30)).split('.')[0]
-                	if not postgre==0:
-				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
-                   		#Deleting an incorrectly created backup due to the disabling of corosync and pacemaker services during the creation of the backup
-                        	os.remove(path + 'base.tar.gz')
-                        	test='OCOD' if set('01').issubset(socket.gethostname()) else 'RCOD'
-				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' An incorrectly created backup copy of the database has been deleted'+test+'\n')
-                        	#Program termination due to disconnection of corosync and pacemaker services during backup creation
-                        	exit()
-                	elif socket.gethostname().find('zbx') < 0:
-                		b=subprocess.Popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz', shell=True, stdout=subprocess.PIPE); bdarch = subprocess.check_output(('xargs', 'echo'),stdin=b.stdout).split("\n")[0]; b.wait()
-                        	os.rename(path + 'temp/' + 'base.tar.gz', path + 'temp/' + bdarch)
-                                os.rename(path + 'temp/' + bdarch, path + bdarch)
-                        	os.system('sleep 15m')
-                        	shutil.rmtree('/tmp/wal', ignore_errors=True)
-                        	os.mkdir('/tmp/wal')
-                        	subprocess.call(["find", "/var/lib/postgresql/9.6/main/pg_xlog/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
-                        	return bdarch
-	elif not postgres==0:
-				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
-                                #Program termination due to inoperability of corosync and pacemaker services
-                                exit()
+			a=1
+		elif IP.index(i)==b:
+			if socket.gethostname().find('zbx')==-1:
+				if not os.path.isdir('/var/lib/postgresql/wal_archive/'): os.mkdir('/var/lib/postgresql/wal_archive/'); uid = pwd.getpwnam("postgres").pw_uid; os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
+			if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
+			elif var==1 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
+			elif var==2 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/'
+			elif var==2 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/'
+			statp=os.system('systemctl status postgresql')
+			a=0
+	if (statcor==0 and statpace=0) or (statp==0 and a==0):
+		start_time = time.time()
+		process=subprocess.Popen(["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setuid(116)).wait();
+                if process==0:
+			with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Successful'+'\n')
+                else:
+                       	with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Unsuccessful'+'\n')
+			return 1
+                TIME='-' + str(round(((time.time() - start_time)/60)+30)).split('.')[0]                                	
+		if not (statcor==0 and statpace==0):
+			with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
+                        #Deleting an incorrectly created backup due to the disabling of corosync and pacemaker services during the creation of the backup
+                        os.remove(path + '/temp/' + 'base.tar.gz')
+			test='OCOD' if set('01').issubset(socket.gethostname()) else 'RCOD'
+			with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' An incorrectly created backup copy of the database has been deleted'+test+'\n')
+                        #Program termination due to disconnection of corosync and pacemaker services during backup creation
+                        exit()
+                elif socket.gethostname().find('zbx')==-1:
+			b=subprocess.Popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz', shell=True, stdout=subprocess.PIPE); bdarch = subprocess.check_output(('xargs', 'echo'),stdin=b.stdout).split("\n")[0]; b.wait() 
+                        os.rename(path + '/temp/' + 'base.tar.gz', path + '/temp/' + bdarch)
+                        os.rename(path + '/temp/' + bdarch, path + bdarch)
+                        os.system('sleep 15m')
+                        shutil.rmtree('/tmp/wal', ignore_errors=True)
+                        os.mkdir('/tmp/wal')
+			subprocess.call(["find", "/var/lib/postgresql/wal_archive/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
+                        subprocess.call(["find", "/var/lib/postgresql/9.6/main/pg_xlog/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
+                        return bdarch
+		elif not (statcor==0 and statpace==0):
+			with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
+                        #Program termination due to inoperability of corosync and pacemaker services
+                        exit()
 def sync(a1, a2):
 	IP=['s39bd1iz01.ac.com', 's39bd1iz02.ac.com', 's39bd2iz01.ac.com', 's39bd2iz02.ac.com', 's39crsvn01.vp.com', 's39crsvn02.vp.com', 's39crsin01.in.com', 's39ccrsin02.in.com']
 		m=0
