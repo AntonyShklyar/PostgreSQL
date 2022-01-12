@@ -2,13 +2,13 @@
 
 '''
 BD clusters:
-    	s39bd1iz01.iz.com
-        s39bd1iz02.iz.com
-        s39bd2iz01.iz.com
-        s39bd2iz02.iz.com
+    	s39bd1iz01.ac.com
+        s39bd1iz02.ac.com
+        s39bd2iz01.ac.com
+        s39bd2iz02.ac.com
         and
-        s39crsvn01.vn.com
-        s39crsvn02.vn.com
+        s39crsvn01.vp.com
+        s39crsvn02.vp.com
         and
         s39crsin01.in.com
         s39crsin02.in.com
@@ -27,31 +27,29 @@ import grp
 import subprocess
 from datetime import datetime
 
-#Creating a log file for long-term storage of script events
-open("/var/log/debugdb.log", "w+")
-#If the size of 1 GB is exceeded, the debug.log is deleted and recreated
-if not os.path.getsize('/var/log/debugdb.log')/(1024*1024*1024)==0: os.remove('/var/log/debugdb.log')
-shutil.copyfile("/var/log/backupdb.log", "/var/log/debugdb.log") 
-#Creating a log file to store the events of one script launch
-os.remove('/var/log/backupdb.log'); open("/var/log/backupdb.log", "w+")
+def logs():
+	#Creating a log file for long-term storage of script events
+	open("/var/log/debugdb.log", "w+")
+	#If the size of 1 GB is exceeded, the debug.log is deleted and recreated
+	if not os.path.getsize('/var/log/debugdb.log')/(1024*1024*1024)==0: os.remove('/var/log/debugdb.log')
+	shutil.copyfile("/var/log/backupdb.log", "/var/log/debugdb.log") 
+	#Creating a log file to store the events of one script launch
+	os.remove('/var/log/backupdb.log'); open("/var/log/backupdb.log", "w+")
 def massive(IP=[]):
-	if set('01').issubset(socket.gethostname()):
+	if socket.gethostname().find('01'):
         	IPIZ = ['10.111.15.54', '10.111.15.63']
                 IPVN = ['10.111.16.54', '10.111.16.63']
                 IPIN = ['10.111.17.54', '10.111.17.63']
-        elif set('02').issubset(socket.gethostname()):
+        elif socket.gethostname().find('02'):
         	IPIZ = ['10.111.15.63', '10.111.15.54']
                 IPVN = ['10.111.16.63', '10.111.16.54']
                 IPIN = ['10.111.17.63', '10.111.17.54']	
 	if socket.gethostname().find('vp.com') >= 0:
-		for i in IPVN:
-			IP.append(i)
+		[IP.append(i) for i in IPVN]
 	elif socket.gethostname().find('ac.com') >= 0:
-                for i in IPIZ:
-                        IP.append(i)
+                [IP.append(i) for i in IPIZ]
 	else:
-		for i in IPIN:
-                        IP.append(i)
+		[IP.append(i) for i in IPIN] 
 	return IP
 def backup(var):
 	IP=['s39bd1iz01.ac.com', 's39bd1iz02.ac.com', 's39bd2iz01.ac.com', 's39bd2iz02.ac.com', 's39crsvn01.vp.com', 's39crsvn02.vp.com', 's39crsin01.in.com', 's39ccrsin02.in.com']
@@ -59,14 +57,15 @@ def backup(var):
 	for i in IP:
 		if i==a:
 			if not os.path.isdir('/var/lib/postgresql/wal_archive/'): os.mkdir('/var/lib/postgresql/wal_archive/'); uid = pwd.getpwnam("postgres").pw_uid; os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
-			if var==1 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/' + socket.gethostname()'
-			elif var==1 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/' + socket.gethostname()'
-			elif var==2 and set('01').issubset(socket.gethostname()): path='/mnt/dbbackup/RCOD/' + socket.gethostname()'
-			elif var==2 and set('02').issubset(socket.gethostname()): path='/mnt/dbbackup/OCOD/' + socket.gethostname()'
+			if var==1 and socket.gethostname().find('01'): path='/mnt/dbbackup/OCOD/' + a'
+			elif var==1 and socket.gethostname().find('02'): path='/mnt/dbbackup/RCOD/' + a'
+			elif var==2 and socket.gethostname().find('01'): path='/mnt/dbbackup/RCOD/' + a'
+			elif var==2 and socket.gethostname().find('02'): path='/mnt/dbbackup/OCOD/' + a'
 			if os.path.exists(path + '/temp/' + 'base.tar.gz'): os.remove(path + '/temp/' + 'base.tar.gz')
 			statcor=os.system('systemctl status corosync')
 			statpace=os.system('systemctl status pacemaker')
-			if statcor==0 and statpace=0:
+			stat
+			if (statcor==0 and statpace=0) or :
 					start_time = time.time()
 					process=subprocess.Popen(["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setuid(116)).wait();
                                         if process==0:
@@ -281,6 +280,7 @@ def mounts(g):
         except subprocess.CalledProcessError, e:
         	n=1
 	return n
+logs()
 var=0
 m=0
 my_array=massive()
@@ -291,17 +291,17 @@ for g in my_array:
 	for i in IP:
 		m += 1
 		if i==a:
-			if var==1 and set('01').issubset(socket.gethostname()): path='/dbbackup/OCOD/' + socket.gethostname()
-			elif var==1 and set('02').issubset(socket.gethostname()): path='/dbbackup/RCOD/' + socket.gethostname()
-			elif var==2 and set('01').issubset(socket.gethostname()): path='/dbbackup/RCOD/' + socket.gethostname()
-			elif var==2 and set('02').issubset(socket.gethostname()): path='/dbbackup/OCOD/' + socket.gethostname()	
+			if var==1 and socket.gethostname().find('01'): path='/dbbackup/OCOD/' + socket.gethostname()
+			elif var==1 and socket.gethostname().find('02'): path='/dbbackup/RCOD/' + socket.gethostname()
+			elif var==2 and socket.gethostname().find('01'): path='/dbbackup/RCOD/' + socket.gethostname()
+			elif var==2 and socket.gethostname().find('02'): path='/dbbackup/OCOD/' + socket.gethostname()	
 		elif m != len(IP):
 			continue
 		else:
-			if var==1 and set('01').issubset(socket.gethostname()): path='/dbbackup/OCOD/'
-			elif var==1 and set('02').issubset(socket.gethostname()): path='/dbbackup/RCOD/'
-			elif var==2 and set('01').issubset(socket.gethostname()): path='/dbbackup/RCOD/'
-			elif var==2 and set('02').issubset(socket.gethostname()): path='/dbbackup/OCOD/'	
+			if var==1 and socket.gethostname().find('01'): path='/dbbackup/OCOD/'
+			elif var==1 and socket.gethostname().find('02'): path='/dbbackup/RCOD/'
+			elif var==2 and socket.gethostname().find('01'): path='/dbbackup/RCOD/'
+			elif var==2 and socket.gethostname().find('02'): path='/dbbackup/OCOD/'	
         #Checking the availability of hypervisor servers with ICMP backup storages
 	mount = subprocess.Popen(("ping", "-c4", g), stdout=subprocess.PIPE); exit_code = subprocess.check_output(("sed", "-n", '1,/^---/d;s/%.*//;s/.*, //g;p;q'), stdin=mount.stdout); mount.wait()
         test='OCOD' if (set('01').issubset(socket.gethostname()) and var==1) or (set('02').issubset(socket.gethostname()) and var==2) else 'RCOD'
