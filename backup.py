@@ -174,7 +174,7 @@ def search():
                                 c,d = sync(var1,var2)
                         else:
                                 c,d = sync(var2,var1)
-def mounts(g, path, s):
+def mounts(var, g, path, s, test):
 	#Mounting storages on a server with a database, if not mounted
         #Checking the ability to write to storages mounted on a server with a database
 	exit_code = subprocess.call(["touch", path+'test'])
@@ -183,17 +183,30 @@ def mounts(g, path, s):
         except subprocess.CalledProcessError, e:
         	n=1
 	if n==1:
-		b=subprocess.Popen(["mount", "//"+g+"/bkp"+path, s, "-o", "vers=3.0,credentials=/opt/creds/CredIZOCOD.txt,rw,file_mode=0666,dir_mode=0777"]).wait();
+		b=subprocess.Popen(["mount", "//"+g+"/bkp"+path, s, "-o", "vers=3.0,credentials=/opt/creds/CredIZ"+test+".txt",rw,file_mode=0666,dir_mode=0777"]).wait();
                 if b!=0 and var==1:
-					with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
-                                        continue
-				elif b!=0 and var==2:
-					with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+ test +'\n')
-                                        exit()
-                                elif b==0 and var==1:
-					with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL database backup storage is'+test+'mounted successfully'+'\n')
-					bdarch=backup()
-	return n
+				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
+                                return 1
+		elif b!=0 and var==2:
+				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+ test +'\n')
+                                exit()
+                elif b==0 and var==1:
+				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL database backup storage is'+test+'mounted successfully'+'\n')
+				bdarch=backup()
+ 	else:
+		if exit_code != 0 and var==1:
+			with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
+			return 1
+		elif exit_code != 0 and var==2:
+                	with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
+                        exit()
+                elif exit_code == 0 and var==1:
+			bdarch=='1'
+                        bdarch=backup()
+		elif exit_code == 0 and var==2 and bdarch=='1':
+			search()
+		elif exit_code == 0 and var==2 and bdarch!='1':	
+			bdarch=backup()
 def networkavailable(var, g, test):
 	#Checking the availability of hypervisor servers with ICMP backup storages
 	test='OCOD' if (socket.gethostname().find('01') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
@@ -216,18 +229,10 @@ for g in my_array:
 	path = var1 if socket.gethostname().find('01') >= 0 else var2
 	test='OCOD' if (socket.gethostname().find('01') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
 	if networkavailable(var, g, test) == 0:
-			if mounts(g)==1:
-                                b=subprocess.Popen(["mount", "//"+g+"/bkp"+path, s, "-o", "vers=3.0,credentials=/opt/creds/CredIZOCOD.txt,rw,file_mode=0666,dir_mode=0777"]).wait();
-                                if b!=0 and var==1:
-					with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
-                                        continue
-				elif b!=0 and var==2:
-					with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+ test +'\n')
-                                        exit()
-                                elif b==0 and var==1:
-					with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL database backup storage is'+test+'mounted successfully'+'\n')
-					bdarch=backup()
-				
+		if mounts(var, g, path, s, test) == 0:	
+			bdarch=backup()
+		elif var==1:
+			continue
                         elif exit_code != 0 and var==1:
                                 with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
                                 bdarch='1'
