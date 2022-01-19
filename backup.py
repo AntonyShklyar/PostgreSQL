@@ -83,8 +83,7 @@ def checkservice():
 		else:
 			with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' corosync and pacemaker services are not running+'\n')
 			exit()
-	elif os.system('systemctl status postgresql') == 0:
-		return 0
+	elif os.system('systemctl status postgresql') == 0: return 0
 	else:
 		with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' postgresql service is not running+'\n')
 		exit()
