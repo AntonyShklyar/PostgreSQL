@@ -23,7 +23,7 @@ end_of_comments
 if [[ ! -f /var/log/debugdb.log ]]; then touch /var/log/debugdb.log; chmod 666 /var/log/debugdb.log; fi
 #If the size of 1 GB is exceeded, the debug.log is deleted and recreated
 if [[ $(find /var/log/ -name debugdb.log -size +1G) ]]; then rm -f /var/log/debugdb.log; fi 
-cp /var/log/backupdb.log /var/log/debugdb.log
+cat /var/log/backupdb.log >> /var/log/debugdb.log
 #Creating a log file to store the events of one script launch
 rm -f /var/log/backupdb.log
 touch /var/log/backupdb.log
