@@ -31,10 +31,19 @@ def logs():
 	#Creating a log file for long-term storage of script events
 	open("/var/log/debugdb.log", "w+")
 	#If the size of 1 GB is exceeded, the debug.log is deleted and recreated
+	if not os.path.exists('/var/log/debugdb.log'): open('/var/log/debugdb.log', "w+")
+	if not os.path.exists('/var/log/backupdb.log'): open('/var/log/backupdb.log', "w+")
 	if not os.path.getsize('/var/log/debugdb.log')/(1024*1024*1024)==0: os.remove('/var/log/debugdb.log')
-	shutil.copyfile("/var/log/backupdb.log", "/var/log/debugdb.log") 
+	data = []
+	with open('/var/log/debugdb.log', 'r') as f:
+   		data = f.readlines()
+	with open('/var/log/backupdb.log', 'r') as f:
+    		data.insert(0, '\n')
+    		data = f.readlines() + data
+	with open('/var/log/debugdb.log', 'w') as f:
+    		f.writelines(data)
 	#Creating a log file to store the events of one script launch
-	os.remove('/var/log/backupdb.log'); open("/var/log/backupdb.log", "w+")
+	open('/var/log/backupdb.log', 'w').close()
 def massive(IP=[]):
 	if socket.gethostname().find('01') >= 0:
         	IPIZ = ['10.111.15.54', '10.111.15.63']
@@ -44,12 +53,9 @@ def massive(IP=[]):
         	IPIZ = ['10.111.15.63', '10.111.15.54']
                 IPVN = ['10.111.16.63', '10.111.16.54']
                 IPIN = ['10.111.17.63', '10.111.17.54']	
-	if socket.gethostname().find('vp.com') >= 0:
-		[IP.insert(0,i) for i in IPVN]
-	elif socket.gethostname().find('ac.com') >= 0:
-                [IP.insert(0,i) for i in IPIZ]
-	else:
-		[IP.insert(0,i) for i in IPIN] 
+	if socket.gethostname().find('vp.com') >= 0: [IP.insert(0,i) for i in IPVN]
+	elif socket.gethostname().find('ac.com') >= 0: [IP.insert(0,i) for i in IPIZ]
+	else: [IP.insert(0,i) for i in IPIN] 
 	return IP
 def cluster(a):
 	IP=['s39bd1iz01.ac.com', 's39bd1iz02.ac.com', 's39bd2iz01.ac.com', 's39bd2iz02.ac.com', 's39crsvn01.vp.com', 's39crsvn02.vp.com', 's39crsin01.in.com', 's39ccrsin02.in.com']
@@ -59,10 +65,8 @@ def cluster(a):
 		if i==a:
 			t=1
 			return t
-		elif IP.index(i)!=b:
-			continue
-		else:
-			return t
+		elif IP.index(i)!=b: continue
+		else: return t
 def path(t, a):
 	if t==1:
 		var1='/mnt/dbbackup/OCOD/' + a
@@ -93,13 +97,10 @@ def backup(path):
 		process=subprocess.Popen(["pg_basebackup", "-D", path + '/temp/', "-Ft", "-z", "-Z", "9", "-P", "--xlog"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setuid(116)).wait();
                 if process==0:
 			with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Successful'+'\n')
-			if var==1:
-				return 0, 1
-			else:
-				return 0, 0
+			return 0
                 else:
                        	with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL Database Backup Unsuccessful'+'\n')
-			return 1, 0
+			return 1
                 TIME='-' + str(round(((time.time() - start_time)/60)+30)).split('.')[0]                                	
 		if checkservice() != 0:
 			with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL DB is not running'+'\n')
@@ -110,9 +111,6 @@ def backup(path):
                         #Program termination due to disconnection during backup creation
                         exit()
                 else socket.gethostname().find('zbx')==-1:
-			b=subprocess.Popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz', shell=True, stdout=subprocess.PIPE); bdarch = subprocess.check_output(('xargs', 'echo'),stdin=b.stdout).split("\n")[0]; b.wait() 
-                        os.rename(path + '/temp/' + 'base.tar.gz', path + '/temp/' + bdarch)
-                        os.rename(path + '/temp/' + bdarch, path + bdarch)
                         os.system('sleep 15m')
                         shutil.rmtree('/tmp/wal', ignore_errors=True)
                         os.mkdir('/tmp/wal')
@@ -142,10 +140,8 @@ def sync(var1, var2, a, b, c, d):
 			else:
 				exit_code = subprocess.call(['diff', var1+j, var2+k])
 				if not exit_code==0:
-					if os.path.getsize(var1+j) > os.path.getsize(var2+k):
-						exit_code = subprocess.call(['cp', var1+j, var2])
-					else:
-						exit_code = subprocess.call(['cp', var2+k, var1])
+					if os.path.getsize(var1+j) > os.path.getsize(var2+k): exit_code = subprocess.call(['cp', var1+j, var2])
+					else: exit_code = subprocess.call(['cp', var2+k, var1])
                                 	if len(d)==1: break
                                         d.remove(k)
                                 else:
@@ -161,13 +157,11 @@ def search():
 			while c != d:
                         	if c > d:
                                 	sync(var1,var2,a,b,c,d)
-					
                                 	continue
                         	else:
                                 	c,d = sync(var2,var1,b,a,d,c)
                                 	continue
-                elif socket.gethostname().find('zbx') >= 0:
-			break
+                elif socket.gethostname().find('zbx') >= 0: break
 		else:
 			ls = subprocess.Popen(("ls", "-t", var1), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait(); c=len(c.splitlines())
         		ls = subprocess.Popen(("ls", "-t", var2), stdout=subprocess.PIPE); b = subprocess.check_output(('grep', 'wal'), stdin=ls.stdout); ls.wait(); d=len(d.splitlines())
@@ -178,14 +172,11 @@ def search():
                         	else:
                                 	c,d = sync(var2,var1,b,a,d,c)
                                 	continue
-                        elif c>d:
-                                c,d = sync(var1,var2)
-                        else:
-                                c,d = sync(var2,var1)
+                        elif c>d: c,d = sync(var1,var2)
+                        else: c,d = sync(var2,var1)
 def mounts(var, g, path, test):
 	#Mounting storages on a server with a database, if not mounted
         #Checking the ability to write to storages mounted on a server with a database
-	exit_code = subprocess.call(["touch", path+'test'])
 	try:
         	ls = subprocess.Popen(("mount"), stdout=subprocess.PIPE); mount = subprocess.check_output(("grep", g), stdin=ls.stdout); ls.wait(); n=5
         except subprocess.CalledProcessError, e:
@@ -205,16 +196,15 @@ def mounts(var, g, path, test):
 				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL database backup storage is'+test+'mounted successfully'+'\n')
 				return 0
  	else:
+		exit_code = subprocess.call(["touch", path+'test'])
 		if exit_code != 0 and var==1:
 			with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
 			return 1
 		elif exit_code != 0 and var==2:
                 	with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
                         exit()
-                elif exit_code == 0 and var==1:
-			return 0
-		elif exit_code == 0 and var==2:
-			return 0		    
+                elif exit_code == 0 and var==1: return 0
+		elif exit_code == 0 and var==2: return 0		    
 def networkavailable(var, g, test):
 	#Checking the availability of hypervisor servers with ICMP backup storages
 	test='OCOD' if (socket.gethostname().find('01') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
@@ -231,70 +221,37 @@ def networkavailable(var, g, test):
 		return 0
 var=0
 my_array=massive()
+bdarch=0
 var1, var2 = path(cluster(a), socket.gethostname())
 for g in my_array:
         var += 1
-	if var==2:
-		var1, var2 = var2, var1
+	if var==2: var1, var2 = var2, var1
 	test='OCOD' if (socket.gethostname().find('01') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
 	if networkavailable(var, g, test) == 0:
-		if mounts(var, g, var1, test) == 0 and var==1:	
-			bdarch=backup()
-		elif mounts(var, g, var1, test) == 0 and var==2:
-			search()
-		elif mounts(var, g, var1, test) != 0 and var==1:
-			continue
-		elif mounts(var, g, var1, test) != 0 and var==2:
-			exit()
-                        elif exit_code != 0 and var==1:
-                                with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
-                                bdarch='1'
+		mount=mounts(var, g, var1, test)
+		if mount == 0 and var==1:	
+			if backup(var1)==0:
+				bdarch=1
+				b=subprocess.Popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz', shell=True, stdout=subprocess.PIPE); copy = subprocess.check_output(('xargs', 'echo'),stdin=b.stdout).split("\n")[0]; b.wait() 
+                        	os.rename(var1 + '/temp/' + 'base.tar.gz', var1 + '/temp/' + copy)
+                       		os.rename(var1 + '/temp/' + copy, var1 + copy)
 				continue
-			elif exit_code != 0 and var==2:
-                                with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
-                                exit()
-                        elif exit_code == 0 and var==1:
-                                bdarch=backup()
-			elif exit_code == 0 and var==2 and bdarch=='1':
-				bdarch=backup()
-			elif exit_code == 0 and var==2 and bdarch!='1':	
-	 	if var==2:
-                        #Mounting storages on a server with a database, if not mounted
-                        #Checking the ability to write to storages mounted on a server with a database
-                        exit_code = subprocess.call(["touch", dir2+'test'])
-			if mounts(g)==1:
-				test='RCOD' if socket.gethostname().find('01') >= 0 else 'OCOD'
-                                os.system('mount -a')
-                                if mounts(g)==1:
-					with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+ test +'\n')
-                                        exit()
-                                elif 'bdarch' in locals() and os.path.exists(dir1+bdarch)==1:
-                                        #Replication (copying of the created backup) to the backup storage
-                                        exit_code = subprocess.call(['cp', dir1+bdarch, dir2])
-					if exit_code==0:
-						with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Replicating a PostgreSQL database backup to another data center storage Successfully '+'\n')
-                                        else:
-						with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Replicating a PostgreSQL database backup to another data center storage Unsuccessfully '+'\n')
-					if set('zbx').issubset(socket.gethostname())==0: subprocess.call(['cp', dir1+'wal_'+bdarch, dir2])
-                                        search()
-                                        break
-                                else:
-					with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL database backup storage is'+test+'mounted successfully'+'\n')
-                                        #Creating a backup copy in the backup storage, since there is no copy in the main storage
-                                    backup()
-                        elif exit_code != 0:
-                                #Creating a backup copy to the backup storage because the main storage is unavailable
-                                exit()
-                        elif 'bdarch' in locals() and os.path.exists(dir1+bdarch)==1:
-                                        #Replication (copying of the created backup) to the backup storage
-				exit_code = subprocess.call(['cp', dir1+bdarch, dir2])
-				if exit_code==0:
-					with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Replicating a PostgreSQL database backup to another data center storage Successfully'+'\n')
-                            	else:
-					with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Replicating a PostgreSQL database backup to another data center storage Unsuccessfully'+'\n')
-				if set('zbx').issubset(socket.gethostname())==0: subprocess.call(['cp', dir1+'wal_'+bdarch, dir2])
-                                search()
-                                break
+			else: continue
+		elif mount != 0 and var==1: continue	
+		elif mount == 0 and var==2 and bdarch==1:
+			exit_code = subprocess.call(['cp', var1+copy, var2])
+			if exit_code==0:
+				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Replicating a PostgreSQL database backup to another data center storage Successfully '+'\n')
                         else:
-                             #Creating a backup copy in the backup storage, since there is no copy in the main storage
-                             backup()
+				with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Replicating a PostgreSQL database backup to another data center storage Unsuccessfully '+'\n')
+			if socket.gethostname().find('zbx') >= 0: 
+				subprocess.call(['cp', var1+'wal_'+bdarch, var2])
+				search()
+		elif mount == 0 and var==2 and bdarch==0:
+			if backup(var1)==0:
+				b=subprocess.Popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz', shell=True, stdout=subprocess.PIPE); copy = subprocess.check_output(('xargs', 'echo'),stdin=b.stdout).split("\n")[0]; b.wait() 
+                        	os.rename(var1 + '/temp/' + 'base.tar.gz', var1 + '/temp/' + copy)
+                       		os.rename(var1 + '/temp/' + copy, var1 + copy)
+			else: exit()
+		elif mount != 0 and var==2: exit()
+	elif var==1: continue
