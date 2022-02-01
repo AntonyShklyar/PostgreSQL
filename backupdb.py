@@ -39,8 +39,8 @@ import os.path
 def logs():
 	'''Creating a session log and a log with a description of all sessions'''
 	#If the size of 1 GB is exceeded, the debugdb.log is deleted and recreated
-	if not os.path.exists('/var/log/debugdb.log'): open('/var/log/debugdb.log', "w+")
-	if not os.path.exists('/var/log/backupdb.log'): open('/var/log/backupdb.log', "w+")
+	if not os.path.exists('/var/log/debugdb.log'): f=open('/var/log/debugdb.log', "w+"); f.close()
+	if not os.path.exists('/var/log/backupdb.log'): f=open('/var/log/backupdb.log', "w+"); f.close()
 	if not os.path.getsize('/var/log/debugdb.log')/(1024*1024*1024)==0: os.system(r' >/var/log/debugdb.log')
 	#Copying information about the previous session from the backupdb.log session log to the debugdb.log debug log
 	data = []
@@ -64,8 +64,8 @@ def massive(IP=[]):
                 IPVN = ['10.111.16.63', '10.111.16.54']
                 IPIN = ['10.111.17.63', '10.111.17.54']
 	#Determination of the domain in which the database server is located
-	if socket.gethostname().find('ac.com') >= 0: [IP.append(i) for i in IPVN]
-	elif socket.gethostname().find('vp.com') >= 0: [IP.append(i) for i in IPIZ]
+	if socket.gethostname().find('vp.com') >= 0: [IP.append(i) for i in IPVN]
+	elif socket.gethostname().find('ac.com') >= 0: [IP.append(i) for i in IPIZ]
 	else: [IP.insert(0,i) for i in IPIN] 
 	#The output is a list of IP-addresses of the main and backup storage
 	return IP
@@ -127,7 +127,7 @@ def checkservice(t):
 def replication(path1, path2, result, copy, copywal):
 	'''Copying a backup to the backup storage'''
 	if result==1:
-        exit_code = subprocess.call(['cp', path1+copy, path2])
+            exit_code = subprocess.call(['cp', path1+copy, path2])
 	if exit_code==0:
 	    with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Replicating a PostgreSQL database backup to another data center storage Successfully '+'\n')
 	#For a server that has 'zbx' in its name, walfiles are not backed up or copied.
@@ -162,20 +162,20 @@ def backup(path, t):
             		if socket.gethostname().find('zbx') < 0:
                 		if not os.path.isdir('/var/lib/postgresql/wal_archive/'): 
                     			os.mkdir('/var/lib/postgresql/wal_archive/') 
-                    			uid = pwd.getpwnam("postgres").pw_uid 
-                    			os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
-                			os.system('sleep 1m')
-                			shutil.rmtree('/tmp/wal', ignore_errors=True)
-                			os.mkdir('/tmp/wal')
-					#Search and collection of WAL-files, created during the time specified in the variable "TIME'
-					subprocess.call(["find", "/var/lib/postgresql/wal_archive/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
-                			subprocess.call(["find", "/var/lib/postgresql/9.6/main/pg_xlog/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
-                			copywal=path + 'wal_' + copy
-                			with tarfile.open(copywal, mode='w:gz') as archive:
-    						archive.add('/tmp/wal/', recursive=True)
-					return 0, copy, copywal
-            			else:
-                			return 0, copy, copywal
+                    		uid = pwd.getpwnam("postgres").pw_uid 
+                    		os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
+                		os.system('sleep 1m')
+                		shutil.rmtree('/tmp/wal', ignore_errors=True)
+                		os.mkdir('/tmp/wal')
+				#Search and collection of WAL-files, created during the time specified in the variable "TIME'
+				subprocess.call(["find", "/var/lib/postgresql/wal_archive/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
+                		subprocess.call(["find", "/var/lib/postgresql/9.6/main/pg_xlog/", "-maxdepth", "1", "-mmin", TIME, "-type", "f", "-exec", "cp", "-pr", "{}", "/tmp/wal", ";"])
+                		copywal=path + 'wal_' + copy
+                		with tarfile.open(copywal, mode='w:gz') as archive:
+    					archive.add('/tmp/wal/', recursive=True)
+				return 0, copy, copywal
+            	        else:
+                	        return 0, copy
         	else:
             		with open("/var/log/backupdb.log","a+") as stdout: 
                 		stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+" PostgreSQL Database Backup Unsuccessful "+'\n')
@@ -328,17 +328,15 @@ def networkavailable(var, g, test):
 	If the function returns 0 - the server with the backup storage is available
 	If the function returns 1 - the server with the backup storage is unavailable
 	If all servers with a backup storage are unavailable, the program will close
-        '''
-main():
-    var=0
-    my_array=massive()
-    result=0
-    #Determining the server name from the database (the name must be FQDN)
-    a=socket.gethostname()
-    logs()
-    t=cluster(a)
-    path1, path2 = path(t, a)
-    for g in my_array:
+	'''
+var=0
+my_array=massive()
+result=0
+a=socket.gethostname()
+logs()
+t=cluster(a)
+path1, path2 = path(t, a)
+for g in my_array:
         var += 1
 	path=path1 if var==1 else path2
 	test='OCOD' if (socket.gethostname().find('01') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
@@ -346,7 +344,10 @@ main():
 		mount=mounts(var, g, path, test)
 		if mount == 0 and var==1:
                         result=0
-                        code, copy, copywal = backup(path, t)
+                        if socket.gethostname().find('zbx') < 0:
+                            code, copy, copywal = backup(path, t)
+                        else:
+                            code, copy = backup(path, t)
 			if code==0:
                                 result=1
 				continue
@@ -359,5 +360,3 @@ main():
                 elif mount == 0 and var == 2 and result == 0:
                     backup(path, t)
     		elif mount != 0 and var==2: exit()
-if __name__=="__main__":
-    main()
