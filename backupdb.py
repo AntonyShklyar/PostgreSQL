@@ -333,7 +333,6 @@ var=0
 my_array=massive()
 result=0
 #Determining the server name from the database (the name must be FQDN)
-#Определение имени сервера с БД (имя должно быть FQDN) 
 a=socket.gethostname()
 logs()
 t=cluster(a)
