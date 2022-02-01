@@ -328,16 +328,17 @@ def networkavailable(var, g, test):
 	If the function returns 0 - the server with the backup storage is available
 	If the function returns 1 - the server with the backup storage is unavailable
 	If all servers with a backup storage are unavailable, the program will close
-	'''
-var=0
-my_array=massive()
-result=0
-#Determining the server name from the database (the name must be FQDN)
-a=socket.gethostname()
-logs()
-t=cluster(a)
-path1, path2 = path(t, a)
-for g in my_array:
+        '''
+main():
+    var=0
+    my_array=massive()
+    result=0
+    #Determining the server name from the database (the name must be FQDN)
+    a=socket.gethostname()
+    logs()
+    t=cluster(a)
+    path1, path2 = path(t, a)
+    for g in my_array:
         var += 1
 	path=path1 if var==1 else path2
 	test='OCOD' if (socket.gethostname().find('crs') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
@@ -358,3 +359,5 @@ for g in my_array:
                 elif mount == 0 and var == 2 and result == 0:
                     backup(path, t)
     		elif mount != 0 and var==2: exit()
+if __name__=="__main__":
+    main()
