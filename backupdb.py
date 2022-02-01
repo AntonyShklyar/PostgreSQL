@@ -72,7 +72,7 @@ def massive(IP=[]):
 def cluster(a):
 	'''Determining if a given server belongs to a DB cluster'''
 	#List of servers included in the database cluster
-	IP=['crs1vn.win.cbr', 's39bd1iz01.ac.com', 's39bd1iz02.ac.com', 's39bd2iz01.ac.com', 's39bd2iz02.ac.com', 's39crsvn01.vp.com', 's39crsvn02.vp.com', 's39crsin01.in.com', 's39ccrsin02.in.com']
+	IP=['s39bd1iz01.ac.com', 's39bd1iz02.ac.com', 's39bd2iz01.ac.com', 's39bd2iz02.ac.com', 's39crsvn01.vp.com', 's39crsvn02.vp.com', 's39crsin01.in.com', 's39ccrsin02.in.com']
 	b=len(IP)-1
 	t=0
 	for i in IP:
@@ -311,7 +311,7 @@ def mounts(var, g, path, test):
 def networkavailable(var, g, test):
 	'''Determining the network availability of storage'''
 	#Checking the availability of hypervisor servers with ICMP backup storages
-	test='OCOD' if (socket.gethostname().find('crs') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
+	test='OCOD' if (socket.gethostname().find('01') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
 	ping = subprocess.Popen(("ping", "-c4", g), stdout=subprocess.PIPE); exit_code = subprocess.check_output(("sed", "-n", '1,/^---/d;s/%.*//;s/.*, //g;p;q'), stdin=ping.stdout); ping.wait()
 	if int(exit_code.replace("\n","")) == 100:
                 if var==1:
@@ -341,7 +341,7 @@ main():
     for g in my_array:
         var += 1
 	path=path1 if var==1 else path2
-	test='OCOD' if (socket.gethostname().find('crs') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
+	test='OCOD' if (socket.gethostname().find('01') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
 	if networkavailable(var, g, test) == 0:
 		mount=mounts(var, g, path, test)
 		if mount == 0 and var==1:
