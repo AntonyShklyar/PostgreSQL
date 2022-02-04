@@ -73,14 +73,7 @@ def cluster(a):
 	'''Determining if a given server belongs to a DB cluster'''
 	#List of servers included in the database cluster
 	IP=['s39bd1iz01.ac.com', 's39bd1iz02.ac.com', 's39bd2iz01.ac.com', 's39bd2iz02.ac.com', 's39crsvn01.vp.com', 's39crsvn02.vp.com', 's39crsin01.in.com', 's39ccrsin02.in.com']
-	b=len(IP)-1
-	t=0
-	for i in IP:
-		if i==a:
-			t=1
-			return t
-		elif IP.index(i)!=b: continue
-		else: return t
+        return 1 if a in IP else 0
 	'''
 	The returned data type is a number.
 	Returning a value indicating whether the server with the database belongs to the servers included in the cluster of database servers:
@@ -329,14 +322,15 @@ def networkavailable(var, g, test):
 	If the function returns 1 - the server with the backup storage is unavailable
 	If all servers with a backup storage are unavailable, the program will close
 	'''
-var=0
-my_array=massive()
-result=0
-a=socket.gethostname()
-logs()
-t=cluster(a)
-path1, path2 = path(t, a)
-for g in my_array:
+main():
+    var=0
+    my_array=massive()
+    result=0
+    a=socket.gethostname()
+    logs()
+    t=cluster(a)
+    path1, path2 = path(t, a)
+    for g in my_array:
         var += 1
 	path=path1 if var==1 else path2
 	test='OCOD' if (socket.gethostname().find('01') >= 0 and var==1) or (socket.gethostname().find('02') >= 0 and var==2) else 'RCOD'
@@ -360,3 +354,5 @@ for g in my_array:
                 elif mount == 0 and var == 2 and result == 0:
                     backup(path, t)
     		elif mount != 0 and var==2: exit()
+if __name__='__main__':
+    main()
