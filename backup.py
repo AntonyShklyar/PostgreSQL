@@ -164,7 +164,7 @@ def main():
         	if process==0:
                         with open("/var/log/backupdb.log","a+") as stdout: 
                 		stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+" PostgreSQL Database Backup Successful "+'\n')
-            		b=subprocess.Popen('echo $(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz', shell=True, stdout=subprocess.PIPE); copy = subprocess.check_output(('xargs', 'echo'),stdin=b.stdout).split("\n")[0]; b.wait() 
+            		b=subprocess.Popen('echo backupdb-$(uname -n)-$(date +"%Y%m%d-%H%M%S").tar.gz', shell=True, stdout=subprocess.PIPE); copy = subprocess.check_output(('xargs', 'echo'),stdin=b.stdout).split("\n")[0]; b.wait() 
             		os.rename(path + 'temp/' + 'base.tar.gz', path + 'temp/' + copy)
             		os.rename(path + 'temp/' + copy, path + '/' + copy)
             		if socket.gethostname().find('zbx') < 0:
@@ -172,7 +172,7 @@ def main():
                     			os.mkdir('/var/lib/postgresql/wal_archive/') 
                     		uid = pwd.getpwnam("postgres").pw_uid 
                     		os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
-                		os.system('sleep 1m')
+                		os.system('sleep 15m')
                 		shutil.rmtree('/tmp/wal', ignore_errors=True)
                 		os.mkdir('/tmp/wal')
 				#Search and collection of WAL-files, created during the time specified in the variable "TIME'
