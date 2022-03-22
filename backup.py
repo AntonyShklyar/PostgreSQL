@@ -41,18 +41,8 @@ def main():
     def logs():
 	'''Creating a session log and a log with a description of all sessions'''
 	#If the size of 1 GB is exceeded, the debugdb.log is deleted and recreated
-	if not os.path.exists('/var/log/debugdb.log'): f=open('/var/log/debugdb.log', "w+"); f.close()
 	if not os.path.exists('/var/log/backupdb.log'): f=open('/var/log/backupdb.log', "w+"); f.close()
-	if not os.path.getsize('/var/log/debugdb.log')/(1024*1024*1024)==0: os.system(r' >/var/log/debugdb.log')
-	#Copying information about the previous session from the backupdb.log session log to the debugdb.log debug log
-	data = []
-	with open('/var/log/debugdb.log', 'r') as f:
-   		data = f.readlines()
-	with open('/var/log/backupdb.log', 'r') as f:
-    		data.insert(0, '\n')
-    		data = f.readlines() + data
-	with open('/var/log/debugdb.log', 'a') as f:
-    		f.writelines(data)
+	if not os.path.getsize('/var/log/backupdb.log')/(1024*1024*1024)==0: os.system(r' >/var/log/backupdb.log')
 	#The function returns 0
     def massive(IP=[]):
 	'''Selection of an array of hypervisor IP addresses depending on the contour'''
