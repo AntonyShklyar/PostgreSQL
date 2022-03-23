@@ -4,16 +4,16 @@
 For Python 2.7.13
 
 BD clusters:
-    	s39bd1iz01.ac.com
-        s39bd1iz02.ac.com
-        s39bd2iz01.ac.com
-        s39bd2iz02.ac.com
+    	bd1iz01.ac.com
+        bd1iz02.ac.com
+        bd2iz01.ac.com
+        bd2iz02.ac.com
         and
-        s39crsvn01.vp.com
-        s39crsvn02.vp.com
+        crsvn01.vp.com
+        crsvn02.vp.com
         and
-        s39crsin01.in.com
-        s39crsin02.in.com
+        crsin01.in.com
+        crsin02.in.com
 
         Data centers:
         01 - OCOD
@@ -64,7 +64,7 @@ def main():
     def cluster(a):
 	'''Determining if a given server belongs to a DB cluster'''
 	#List of servers included in the database cluster
-	IP=['s39bd1iz01.ac.com', 's39bd1iz02.ac.com', 's39bd2iz01.ac.com', 's39bd2iz02.ac.com', 's39crsvn01.vp.com', 's39crsvn02.vp.com', 's39crsin01.in.com', 's39ccrsin02.in.com']
+	IP=['bd1iz01.ac.com', 'bd1iz02.ac.com', 'bd2iz01.ac.com', 'bd2iz02.ac.com', 'crsvn01.vp.com', 'crsvn02.vp.com', 'crsin01.in.com', 'crsin02.in.com']
 	b=len(IP)-1
 	t=0
 	for i in IP:
@@ -230,28 +230,7 @@ def main():
 			            exit_code=subprocess.call(['cp', path1+i, path2])
                                 return 0
                             break
-                            '''
-				"""
-				Checksum verification of backups with the same name.
-                                If the checksums do not match, the file with a smaller size is deleted, and a file with a larger size is copied from another storage in its place.
-				"""
-				exit_code = subprocess.call(['diff', path1+j, path2+k])
-				if exit_code != 0:
-					if os.path.getsize(path1+j) > os.path.getsize(path2+k): 
-                                            exit_code = subprocess.call(['cp', path1+j, path2])
-					else: 
-                                            exit_code = subprocess.call(['cp', path2+k, path1])
-                                        #Removing an element from the list "b" in order to reduce the number of iterations of the main loop
-					b.remove(k)
-					#Decreasing the value of the variable, containing the number of elements of the string "b", by 1
-                                        d-=1
-                                        break
-                                else:
-                                        b.remove(k)
-                                        d-=1
-                                        break
-                                '''
-	#The function returns None
+        #The function returns None
     def search(path1, path2, i):
 	'''Checking 'sync' trigger conditions'''
 	def checkcopy(path1, path2, i):
