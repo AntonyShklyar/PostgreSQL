@@ -1,28 +1,34 @@
 Initial data (subject to change):
-
+-----------------------------------------
 System architecture:
 3 network segments:
 --external (in.com)
 --internal (vp.com)
 --isolated (ac.com)
+
 Segments can be added in the "domain" dictionary of backup.py and restore.py files
 2 data centers:
 --OCOD (01)
 --RCOD (02)
+
 Data center names and their numeric identifiers can be added to the "codid" and "codname" dictionaries of the backup.py and restore.py files
 There is no interaction between segments.
+
 The belonging of a server to a segment/data center can be determined by the domain name / number that is in the FQDN name of each server (should be written in /etc/hostname). For example, the server bd1iz01.ac.com belongs to an isolated segment of the main data center.
 2 backup storage servers for each segment.
 --outer segment - 10.111.15.54, 10.111.15.63
 --internal segment - 10.111.16.54, 10.111.16.63
 -- isolated segment - 10.111.17.54, 10.111.17.63
+
 The IP addresses of the backup storage servers can be added to the "domain" dictionary of the backup.py and restore.py files
 3 PostgreSQL DBMS clusters.
 The following is the correspondence between the cluster servers and the virtual IP address of the cluster:
 bd1iz01.ac.com, bd1iz02.ac.com, bd2iz01.ac.com, bd2iz02.ac.com - 10.111.15.80
 crsvn01.vp.com, crsvn02.vp.com - 10.111.16.80
 crsin01.in.com, crsin02.in.com - 10.111.17.80
+
 The names of the servers included in the cluster and the virtual IP address of the cluster can be added to the "vipcluster" dictionary of the backup.py and restore.py files
+
 The servers are running Linux.
 
 Backup storage:
