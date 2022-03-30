@@ -1,0 +1,27 @@
+Changeable parameters:
+--codid
+The data type is a dictionary.
+Data - Data Center ID: Data Center Name
+--codename
+The data type is a dictionary.
+Data - data center name: list of IP addresses of data center storages
+--domain
+The data type is a dictionary.
+Data - domain: list of IP addresses of domain stores
+--vipcluster
+The data type is a dictionary.
+Data - virtual IP address of the cluster master node: list of servers included in the cluster
+
+The algorithm of the restore.py script:
+1. check for the existence of the backupdb.log log file. If not, create a file. File size check. If the size equal to 1 GB is reached, the file is cleared;
+2. checking network availability via ICMP protocol of servers with backup storages;
+3. determination of available IP addresses of servers with backup storages and segments/data centers in which they are located;
+4. Checking the availability of backup storages via the SMB protocol. Mounting a network resource if the share is not mounted;
+5. determination of mount points of available storages;
+6. checking the presence of a reserved server in the dictionary of servers included in database clusters;
+7. if the server is part of a database cluster, the virtual IP address of the cluster is determined;
+8. prompting the user to start the backup procedure;
+9. if the server is part of a database cluster, it is restored - database replication from the master node. In the event of a cluster crash, the cluster is restored manually;
+10. if the server is not part of the database cluster, the available repositories and the copies that are in them will be shown;
+11. prompting the user for a backup name in accordance with the format;
+12. restoring the database from a backup.
