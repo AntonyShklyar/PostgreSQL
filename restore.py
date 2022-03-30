@@ -3,16 +3,7 @@
 #Added the ability to restore from a backup of any cluster server
 '''
 For Python 2.7.13
-
-	Data centers:
-	01 - OCOD
-	02 - RCOD
-
-	Domaines:
-	ac.com
-	vp.com
-	in.com
-'''       
+'''
 
 import os
 import tarfile
@@ -27,207 +18,174 @@ def main():
         if not os.path.exists('/var/log/backupdb.log'): f=open('/var/log/backupdb.log', "w+"); f.close()
         if not os.path.getsize('/var/log/backupdb.log')/(1024*1024*1024)==0: os.system(r' >/var/log/backupdb.log')
         #The function returns 0
-    def massive(ocod, domvn, domiz, IP=[]):
-        '''Selection of an array of hypervisor IP addresses depending on the contour'''
-        #Determining the main storage (the storage located on the same subnet as the database server)
-        if socket.gethostname().find(ocod) >= 0:
-                IPIZ = ['10.111.15.54', '10.111.15.63']
-                IPVN = ['10.111.16.54', '10.111.16.63']
-                IPIN = ['10.111.17.54', '10.111.17.63']
-        else:
-                IPIZ = ['10.111.15.63', '10.111.15.54']
-                IPVN = ['10.111.16.63', '10.111.16.54']
-                IPIN = ['10.111.17.63', '10.111.17.54']
-        #Determination of the domain in which the database server is located
-        if socket.gethostname().find(domvn) >= 0: [IP.append(i) for i in IPVN]
-        elif socket.gethostname().find(domiz) >= 0: [IP.append(i) for i in IPIZ]
-        else: [IP.insert(0,i) for i in IPIN]
-        #The output is a list of IP-addresses of the main and backup storage
-        return IP
-    def paths(a, ocod, domvn, domiz, codlist):
+    def paths(a, domain, codname, codid):
         '''Determining the backup storage mount point'''
-        path=[]
-        for k,j in enumerate(codlist, 1):
+	d={}
+	for x, y in domain.items():
+		if x in a:
+		    d[x]=y
+	s=networkavailable(d,codname) 
+        dic={}
+        for k,(i,j) in enumerate(s.items(), 1):
             try:
-		temp=subprocess.check_output("ls -d /mnt/dbbackup/"+j+"/*/", shell=True).split("\n"); temp.remove('')
+		temp=subprocess.check_output("ls -d /mnt/dbbackup/"+i+"/*/", shell=True).split("\n"); temp.remove('')
 	    except subprocess.CalledProcessError:
                 print
-                print(' '.join(['Problems with the operation of the smbd service on the server with the repository of ',j]))
+                print(' '.join(['Problems with the operation of the smbd service on the server with the repository of ',i]))
                 print
-                with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+j+'\n')
-                if k < len(codlist):
+                with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+i+'\n')
+                if k < len(s):
                     continue
-                elif len(path)==0:
+                elif len(dic)==0:
                     exit()
-            path.append(temp)
-	IP=massive(ocod, domvn, domiz)
-        d={}
-        for x in path:
-            for y in x:
-		if "OCOD" in y:
-        		d[y] = IP[0]
-    		else:
-        		d[y] = IP[1]
-	return d, len(path)
+		elif k==len(s) and len(dic)!=0:
+			break
+            dic[i]=temp
+        e=mounts(s, dic)	
+	return e, len(e)
         '''
-        The returned data type is a dictionary (Storage mount point: IP-address of the storage) and count of storage mount point
+        The returned data type is a list (Storage mount point) and count of storage mount point
         '''
-    def mounts(var, g, path, test):
+    def mounts(s, dic):
         '''Checking if the ball is mounted'''
         #Mounting storages on a server with a database, if not mounted
         #Checking the ability to write to storages mounted on a server with a database
-        try:
-		ls = subprocess.Popen(("mount"), stdout=subprocess.PIPE); mount = subprocess.check_output(("grep", g), stdin=ls.stdout); ls.wait(); n=5
-        except subprocess.CalledProcessError, a:
-                n=1
-        c=[]
 	e=[]
-        for k,v in path.items():
-            if v == g:
-                c.append(k)
-        s=len(c)
-	for l, j in enumerate(c, 1):
-        	if n==1:
-                	b=subprocess.Popen(["mount", "//"+g+"/bkp"+j.replace('/mnt', ''), j, "-o", "vers=3.0,credentials=/opt/creds/CredIZ"+test+".txt,rw,file_mode=0666,dir_mode=0777"]).wait();
-                	if b!=0 and var==1:
-                            print(' '.join(['Problems with the operation of the smbd service on the server with the repository of ',test]))
-                            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
-                            if l < s:
-			        continue
-			    else:
-			        return 1
-                	elif b!=0 and var==2:
-                            print(' '.join(['Problems with the operation of the smbd service on the server with the repository of ',test]))
-                            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+ test +'\n')
-                            if l < s:
-                                continue
+        for i, j in s.items():
+            for z, (x, y) in enumerate(dic.items(), 1):
+                for p, l in enumerate(j, 1):
+                    for k, t in enumerate(y, 1):
+                        if i==x:
+                            try:
+		                ls = subprocess.Popen(("mount"), stdout=subprocess.PIPE); mount = subprocess.check_output(("grep", l), stdin=ls.stdout); ls.wait(); n=5
+                            except subprocess.CalledProcessError, a:
+                                n=1
+        	            if n==1:
+                	        b=subprocess.Popen(["mount", "//"+l+"/bkp"+t.replace('/mnt', ''), t, "-o", "vers=3.0,credentials=/opt/creds/CredIZ"+i+".txt,rw,file_mode=0666,dir_mode=0777"]).wait();
+                	        if b!=0:
+                                    print(' '.join(['Problems with the operation of the smbd service on the server with the repository of ',i]))
+                                    with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+i+'\n')
+                                    if k < len(y):
+                                        continue
+                                    elif z<len(dic):
+                                        break
+                                    elif z==len(dic):
+                                        return 1                	        
+                                else:
+                                    print(' '.join(['PostgreSQL database backup storage is ',i,' mounted successfully']))
+                                    with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL database backup storage is '+i+' mounted successfully'+'\n')
+                                    if k < len(y):
+                 	                e.append(t)
+                                        continue
+                                    elif z<len(dic):
+                                        e.append(t)
+                                        break
+                                    elif z==len(dic):
+                                        e.append(t)
+                                        return e
                             else:
-                                exit()
-                	elif b==0 and var==1:
-                            print(' '.join(['PostgreSQL database backup storage is ',test,' mounted successfully']))
-                            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL database backup storage is '+test+' mounted successfully'+'\n')
-                            if l < s:
-                 	        e.append(j)
-                                continue
-                            else:
-                 	        e.append(j)
-                                return e
-                	elif b==0 and var==2:
-                            print(' '.join(['PostgreSQL database backup storage is ',test,' mounted successfully']))
-                            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' PostgreSQL database backup storage is'+test+'mounted successfully'+'\n')
-                            if l < s:
-                 	        e.append(j)
-                                continue
-                            else:
-                 	        e.append(j)
-                                return e
-            	else:
-                	exit_code = subprocess.call(["touch", j+'test'])
-                	if exit_code != 0 and var==1:
-                            print(' '.join(['Problems with the operation of the smbd service on the server with the repository of ',test]))
-                            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
-                            if l < s:
-                                continue
-                            else:
-                                return 1
-                	elif exit_code != 0 and var==2:
-                            print(' '.join(['Problems with the operation of the smbd service on the server with the repository of ',test]))
-                            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+test+'\n')
-                            if l < s:
-                                continue
-                            else:
-                                exit()
-                	elif exit_code == 0 and var==1:
-			    if l < s:
-                 	        e.append(j)
-                                continue
-                            else:
-                 	        e.append(j)
-                                return e
-                	elif exit_code == 0 and var==2:
-			    if l < s:
-                 	        e.append(j)
-                                continue
-                            else:
-                 	        e.append(j)
-                                return e
+                	        exit_code = subprocess.call(["touch", t+'test'])
+                	        if exit_code != 0:
+                                    print(' '.join(['Problems with the operation of the smbd service on the server with the repository of ',i]))
+                                    with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Problems with the operation of the smbd service on the server with the repository of'+i+'\n')
+                                    if k < len(y):
+                                        continue
+                                    elif z<len(dic):
+                                        break
+                                    elif z==len(dic):
+                                        return 1
+                                else:
+			            if k < len(y):
+                 	                e.append(t)
+                                        continue
+                                    elif z<len(dic):
+                                        e.append(t)
+                                        break
+                                    elif z==len(dic):
+                                        e.append(t)
+                                        return e
         '''
         Return data type - massive/number
         If the function returns e (path to storage mount point), the storage is available
         If the function returns 1, the storage is not available
-        If all storages are mounted unsuccessfully, the program will close
         '''
-    def networkavailable(var, g, test, ocod, rcod):
+    def networkavailable(d, codname):
         '''Determining the network availability of storage'''
-        #Checking the availability of hypervisor servers with ICMP backup storages
-        test='OCOD' if (socket.gethostname().find(ocod) >= 0 and var==1) or (socket.gethostname().find(rcod) >= 0 and var==2) else 'RCOD'
-        ping = subprocess.Popen(("ping", "-c4", g), stdout=subprocess.PIPE); exit_code = subprocess.check_output(("sed", "-n", '1,/^---/d;s/%.*//;s/.*, //g;p;q'), stdin=ping.stdout); ping.wait()
-        if int(exit_code.replace("\n","")) == 100:
-                if var==1:
-			print(' '.join(['Server with storage ',test,' is not available']))
-                        print
-                        with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Server with storage '+test+' is not available'+'\n')
-                        return 1
+        Checking the availability of hypervisor servers with ICMP backup storages
+        l={}
+        for x, y in d.items():
+            for i, j in codname.items():
+                for z in y:
+                    for k in j:
+                        if z in k:
+                            l.setdefault(i, [])
+                            l[i].append(k)
+        s={}
+        for i, j in l.items():
+            for x in j:
+                ping = subprocess.Popen(("ping", "-c4", x), stdout=subprocess.PIPE); exit_code = subprocess.check_output(("sed", "-n", '1,/^---/d;s/%.*//;s/.*, //g;p;q'), stdin=ping.stdout); ping.wait()
+                if int(exit_code.replace("\n","")) == 100:
+		    print(' '.join(['Server with storage ',i,' is not available']))
+                    print
+                    with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Server with storage '+i+' is not available'+'\n')
                 else:
-			print(' '.join(['Server with storage ',test,' is not available']))
-                        print
-                        with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Server with storage '+test+' is not available'+'\n')
-                        exit()
-        else:
-		print(' '.join(['Server with storage ',test,' is available']))
-                print
-                with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Server with storage '+test+' is available'+'\n')
-                return 0
+		    print(' '.join(['Server with storage ',i,' is available']))
+                    print
+                    with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Server with storage '+i+' is available'+'\n')
+                    s.setdefault(i, [])
+                    s[i].append(x)
+        if len(s)==0:
+            print(' '.join(['Servers with storage is not available']))
+            print
+            with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Servers with storage is not available'+'\n')
+            exit()
+        return s
         '''
-        Return data type - number
-        If the function returns 0 - the server with the backup storage is available
-        If the function returns 1 - the server with the backup storage is unavailable
+        Return data type - dictionary
+        Data - ta center name and array of IP-addresses of each data center.
         If all servers with a backup storage are unavailable, the program will close
         '''
-    def shareavailable(path, n, ocod, rcod, domvn, domiz):
-        '''Checking network storage availability'''
-        result=0
-        IP=[]
-	array=[]
-        for k,v in path.items():
-            IP.append(v)
-        for var,g in enumerate(IP, 1):
-            test=ocod if (socket.gethostname().find(ocod) >= 0 and var==1) or (socket.gethostname().find(rcod) >= 0 and var==2) else rcod
-            if networkavailable(var, g, test, ocod, rcod) == 0:
-                e=mounts(var, g, path, test)
-                if e==1:
-                    continue
+    def cluster(vipcluster, a):
+        for i, j in vipcluster.items():
+            for k in j:
+                if a in k:
+                    IP=i
+                    return IP
                 else:
-                    for i in e:
-		        array.append(i)
-                    if var==2:
-                        return array
-	    else:
-		continue
-        return array
-        '''
-        Return data types - massive
-        If function returns array - data center NAS available
-        If all servers with a backup storage are unavailable or all data centers NAS unavailable, the program will close
-        '''
-    def restore(array):
+                    return 1
+    def restore(path, t):
 	'''Restoring from a backup'''
+        if t==1:
+	    subprocess.call(['rm', '-rf', '/var/lib/postgresql/9.6/main'])
+            process=subprocess.Popen(['pg_basebackup', '-h', IP, '-p', '5432', '-U', 'postgres', '-D', '/var/lib/postgresql/9.6/main/', '-P', '--xlog'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if process==0:
+                print(' '.join(['Cluster master-node ', IP, ' is available']))
+                with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Cluster master-node '+IP+' is available'+'\n')
+                subprocess.call(['rm', '/var/lib/pgsql/tmp/PGSQL.lock'])
+	        subprocess.call(['chmod', '0700', '/var/lib/postgresql/9.6/main', '-R'])
+	        subprocess.call(['chown', 'postgres:postgres', '/var/lib/postgresql/9.6/main', '-R'])
+                subprocess.call(['pcs', 'cluster', 'start'])
+                exit()
+            else:
+                print(' '.join(['Cluster master-node ', IP, ' is not available. Cluster needs to be restored manually']))
+                with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Cluster master-node '+IP+' is available. Cluster needs to be restored manually'+'\n')
+                exit()
 	#View backups in available locations
-	for i in range(len(array)):
-         	print(' '.join(['Backup list', array[i]]))
+	for i in range(len(path)):
+         	print(' '.join(['Backup list', path[i]]))
                 print
                 try:
-                    ls = subprocess.Popen(("ls", "-rI","wal*", array[i]), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); a=a.split("\n"); a.remove('')
+                    ls = subprocess.Popen(("ls", "-rI","wal*", path[i]), stdout=subprocess.PIPE); a = subprocess.check_output(('grep', 'tar.gz'), stdin=ls.stdout); a=a.split("\n"); a.remove('')
                     for j in a:
                         print(j)
                 except subprocess.CalledProcessError:
-			print('No copy in NAS ', array[i])
+			print('No copy in NAS ', path[i])
                         print
-                        if len(array)==1:
+                        if len(path)==1:
                             print('There are no copies. Completion of the program.')
 			    exit()
 			continue 
- 	print(' '.join(['Enter the date and time of the PostgreSQL database backup in the format', array[0] + a[0]])); bddata = raw_input()
+ 	print(' '.join(['Enter the date and time of the PostgreSQL database backup in the format', path[0] + a[0]])); bddata = raw_input()
         print
         #Selecting the desired backup by the user
 	if os.path.exists(bddata):
@@ -236,38 +194,51 @@ def main():
                 bd = raw_input('No copy exists. Choose another one? y/n ')
                 d = {'y': restore, 'n': exit}
 		try:
-			d[bd](array)
+                    d[bd](path, t) if bd=='y' else d[bd]()
 		except KeyError:
-            		print('Invalid value entered. Try again'); restore(array)
+            		print('Invalid value entered. Try again'); restore(path, t)
 	#Commands of recovery from reserve copy
 	os.system('systemctl stop postgresql')
-        os.system('sudo su - postgres -c "rm -rf /var/lib/postgresql/9.6/main/*"')
-        subprocess.call(["tar", "-C", "/var/lib/postgresql/9.6/main/", "-xvf", bddata])
-        os.system('systemctl start postgresql')
+	os.system('sudo su - postgres -c "rm -rf /var/lib/postgresql/9.6/main/*"')
+	subprocess.call(["tar", "-C", "/var/lib/postgresql/9.6/main/", "-xvf", bddata])
+	os.system('systemctl start postgresql')
 	'''
         Return data types - None
         '''
-    def input(array):
+    def input(path, t):
 	'''Consent/refuse to restore from a backup'''
         bd = raw_input('The checks were successful. Start the procedure for restoring the database? y,n ')
         d = {'y': restore, 'n': exit}
         try:
-        	d[bd](array)
+            d[bd](path, t) if bd=='y' else d[bd]()
         except KeyError:
-            print('Invalid value entered. Try again'); input(array)
+            print('Invalid value entered. Try again'); input(path, t)
             print
 	'''
         Return data types - None
-        '''
-    a=socket.gethostname()
-    ocod='01'
-    rcod='02'
-    domvn='vp.com'
-    domiz='ac.com'
-    codlist=['OCOD', 'RCOD']
+    '''
+    Editable parameters:
+    --codd
+    The data type is a dictionary.
+    Data - Data Center ID: Data Center Name
+    --codname
+    The data type is a dictionary.  a=socket.gethostname()
+    Data - data center name: list of IP addresses of data center storages    
+    --domain
+    The data type is a dictionary.
+    Data - domain: list of IP addresses of domain stores
+    --vipcluster
+    The data type is a dictionary.
+    Data - virtual IP address of the cluster master node: list of servers included in the cluster    
+    '''
+    codid={'01':'OCOD', '02':'RCOD'}
+    codname={'OCOD':['10.111.15.54', '10.111.16.54', '10.111.17.54'], 'RCOD':['10.111.15.63', '10.111.16.63', '10.111.17.63']}
+    domain={'ac.com':['10.111.15.54', '10.111.15.63'],'vp.com':['10.111.16.54', '10.111.16.63'],'in.com':['10.111.17.54', '10.111.17.63']}
+    vipcluster={'10.111.15.80':['bd1iz01.ac.com', 'bd1iz02.ac.com', 'bd2iz01.ac.com', 'bd2iz02.ac.com'], '10.111.16.80':['crsvn01.vp.com', 'crsvn02.vp.com'], '10.111.17.80':['crsin01.in.com', 'crsin02.in.com']}
     logs()
-    path,n = paths(a, ocod, domvn, domiz, codlist)
-    array=shareavailable(path, n, ocod, rcod, domvn, domiz)
-    input(array)
+    path,n = paths(a, domain, codname, codid)
+    IP=cluster(vipcluster, a)
+    t=0 if IP==1 else 1
+    input(path, t)
 if __name__ == '__main__':
     main()
