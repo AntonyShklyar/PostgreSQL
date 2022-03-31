@@ -111,7 +111,7 @@ def main():
         '''
     def networkavailable(d, codname):
         '''Determining the network availability of storage'''
-        Checking the availability of hypervisor servers with ICMP backup storages
+        #Checking the availability of hypervisor servers with ICMP backup storages
         l={}
         for x, y in d.items():
             for i, j in codname.items():
