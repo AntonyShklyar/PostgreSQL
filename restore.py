@@ -228,7 +228,7 @@ def main():
     The data type is a dictionary.
     Data - Data Center ID: Data Center Name
     --codname
-    The data type is a dictionary.  a=socket.gethostname()
+    The data type is a dictionary.
     Data - data center name: list of IP addresses of data center storages    
     --domain
     The data type is a dictionary.
@@ -242,6 +242,7 @@ def main():
     domain={'ac.com':['10.111.15.54', '10.111.15.63'],'vp.com':['10.111.16.54', '10.111.16.63'],'in.com':['10.111.17.54', '10.111.17.63']}
     vipcluster={'10.111.15.80':['bd1iz01.ac.com', 'bd1iz02.ac.com', 'bd2iz01.ac.com', 'bd2iz02.ac.com'], '10.111.16.80':['crsvn01.vp.com', 'crsvn02.vp.com'], '10.111.17.80':['crsin01.in.com', 'crsin02.in.com']}
     logs()
+    a=socket.gethostname()
     path,n = paths(a, domain, codname, codid)
     IP=cluster(vipcluster, a)
     t=0 if IP==1 else 1
