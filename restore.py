@@ -156,19 +156,25 @@ def main():
     def restore(path, t):
 	'''Restoring from a backup'''
         if t==1:
-	    subprocess.call(['rm', '-rf', '/var/lib/postgresql/9.6/main'])
-            process=subprocess.Popen(['pg_basebackup', '-h', IP, '-p', '5432', '-U', 'postgres', '-D', '/var/lib/postgresql/9.6/main/', '-P', '--xlog'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            if process==0:
-                print(' '.join(['Cluster master-node ', IP, ' is available']))
-                with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Cluster master-node '+IP+' is available'+'\n')
-                subprocess.call(['rm', '/var/lib/pgsql/tmp/PGSQL.lock'])
-	        subprocess.call(['chmod', '0700', '/var/lib/postgresql/9.6/main', '-R'])
-	        subprocess.call(['chown', 'postgres:postgres', '/var/lib/postgresql/9.6/main', '-R'])
-                subprocess.call(['pcs', 'cluster', 'start'])
-                exit()
+	    postgre = subprocess.check_output("ps aux | grep '/bin/postgre' | grep -v 'grep /bin/postgre' | awk '{print $11}'", shell=True).split("\n"); id.remove(''); 
+	    if len(postgre) != 0 and os.system('systemctl status corosync > /dev/null 2>&1') == 0 and os.system('systemctl status pacemaker > /dev/null 2>&1') == 0:
+	    	subprocess.call(['rm', '-rf', '/var/lib/postgresql/9.6/main'])
+            	process=subprocess.Popen(['pg_basebackup', '-h', IP, '-p', '5432', '-U', 'postgres', '-D', '/var/lib/postgresql/9.6/main/', '-P', '--xlog'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            	if process==0:
+                	print(' '.join(['Cluster master-node ', IP, ' is available']))
+                	with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Cluster master-node '+IP+' is available'+'\n')
+                	subprocess.call(['rm', '/var/lib/pgsql/tmp/PGSQL.lock'])
+	        	subprocess.call(['chmod', '0700', '/var/lib/postgresql/9.6/main', '-R'])
+	        	subprocess.call(['chown', 'postgres:postgres', '/var/lib/postgresql/9.6/main', '-R'])
+                	subprocess.call(['pcs', 'cluster', 'start'])
+                	exit()
+		else:
+			print(' '.join(['Cluster master-node ', IP, ' is not available. Cluster needs to be restored manually']))
+                	with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Cluster master-node '+IP+' is available. Cluster needs to be restored manually'+'\n')
+                	exit()
             else:
-                print(' '.join(['Cluster master-node ', IP, ' is not available. Cluster needs to be restored manually']))
-                with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Cluster master-node '+IP+' is available. Cluster needs to be restored manually'+'\n')
+                print(' '.join(['Cluster needs to be restored manually']))
+                with open("/var/log/backupdb.log","a+") as stdout: stdout.write(str(datetime.now().strftime("%Y%m%d-%H%M%S"))+' Cluster needs to be restored manually'+'\n')
                 exit()
 	#View backups in available locations
 	for i in range(len(path)):
