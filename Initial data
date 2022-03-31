@@ -1,0 +1,52 @@
+Initial data (subject to change):
+------------------------------------------------------
+Logical structure of the system
+Structurally, the system consists of the following segments: 3 network segments:
+•	external (in.com)
+•	internal (vp.com)
+•	isolated (ac.com)
+Segments can be added in the "domain" dictionary of «backup.py» and «restore.py» files.
+The fault tolerance of the segments is ensured by the presence of a main data center (OCOD) and reserve data center (RCOD). RCOD accepts connections in the event of a failure of the hardware and/or software of the main data center.
+2 data centers:
+•	OCOD (01)
+•	RCOD (02)
+Data center names and their numeric identifiers can be added to the "codid" and "codname" dictionaries of the backup.py and restore.py files
+All segments operate within the same data center. The interaction of technical means between segments is excluded.
+The interaction of technical means between data centers within the same segment is allowed.
+The belonging of a server to a segment/data center can be determined by the domain name/number that is in the FQDN name of each server (should be written in /etc/hostname). For example, the server bd1iz01.ac.com belongs to an isolated segment of the main data center.
+For each segment of the data center, 1 server for storing backups is allocated. A total of 6 storage servers (2 in each segment - one in the OCOD and the other in the RCOD)
+•	outer segment - 10.111.15.54, 10.111.15.63
+•	internal segment - 10.111.16.54, 10.111.16.63
+•	isolated segment - 10.111.17.54, 10.111.17.63
+The IP addresses of the backup storage servers can be added to the "domain" dictionary of the «backup.py» and «restore.py» files.
+In each segment, a DBMS cluster is deployed, which includes the database servers of the OCOD and RCOD. 3 PostgreSQL DBMS clusters.
+The following is the correspondence between the cluster servers and the virtual IP address of the cluster:
+•	bd1iz01.ac.com, bd1iz02.ac.com, bd2iz01.ac.com, bd2iz02.ac.com - 10.111.15.80
+•	crsvn01.vp.com, crsvn02.vp.com - 10.111.16.80
+•	crsin01.in.com, crsin02.in.com - 10.111.17.80
+The names of the servers included in the cluster and the virtual IP address of the cluster can be added to the "vipcluster" dictionary of the «backup.py» and «restore.py» files
+The servers are running Linux.
+The number of servers with backup storages in 1 segment is 2.
+The number of PostgreSQL DBMS backup storages for one data center and 1 segment is 1.
+The backup storage is a Samba resource deployed on a Linux server.
+On each server with PostgreSQL DBMS, a network resource of the main and backup data centers is mounted.
+If the redundant server is part of a cluster, then directories with backup copies of all servers included in the cluster must be mounted on it in order to be able to restore from a backup copy of another server included in the cluster. The mount point is a directory with the FQDN of the server.
+For example, server bd1iz01.ac.com will have mount points /mnt/dbbackup/OCOD/bd1iz01.ac.com, /mnt/dbbackup/RCOD/bd1iz01.ac.com, /mnt/dbbackup/OCOD/bd2iz01.ac.com , /mnt/dbbackup/RCOD/bd1iz02.ac.com and /mnt/dbbackup/RCOD/bd2iz02.ac.com.
+The backup archive includes the DBMS structure (the contents of the main directory) and the WAL segment files generated during file copying.
+The WAL file archive includes the WAL segment files generated during the file backup and for the next 15 minutes.
+PostgreSQL DBMS cluster based on Corosync + Pacemaker
+The total number of PostgreSQL database clusters is 3. The clusters are independent of each other.
+For servers included in the PostgreSQL DBMS cluster, the following is created:
+•	PostgreSQL DBMS backup archive. The naming format is backupdb-"server name"-"creation date".tar.gz;
+•	WAL file archive. The naming format is wal-"server name"-"creation date".tar.gz.
+For servers not included in the PostgreSQL DBMS cluster, the following is created:
+•	PostgreSQL DBMS backup archive. The naming format is backupdb-"server name"-"creation date".tar.gz.
+PostgreSQL DBMS is restored from a backup archive.
+
+Versions:
+•	Python version - 2.7.13
+•	PostgreSQL DBMS version - 9.6
+•	OS: Linux
+•	Corosync: 2.4.2-3
+•	Pacemaker: 1.1.16-1
+•	SMB: 3.0
