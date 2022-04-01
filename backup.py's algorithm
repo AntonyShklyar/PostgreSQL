@@ -19,7 +19,7 @@ The algorithm of the “backup.py” script:
 1.	check for the existence of the backupdb.log log file. If not, create a file. File size check. If the size equal to 1 GB is reached, the file is cleared;
 2.	checking network availability via ICMP protocol of servers with backup storages;
 3.	determination of available IP addresses of servers with backup storages and segments/data centers in which they are located;
-4.	Checking the availability of backup storages via the SMB protocol. Mounting a network resource if the share is not mounted;
+4.	checking the availability of backup storages via the SMB protocol. Mounting a network resource if the share is not mounted;
 5.	determination of mount points of available storages;
 6.	checking the presence of a reserved server in the dictionary of servers included in database clusters;
 7.	if the server is part of the database cluster, the status of the corosync and pacemaker services is checked, as well as the presence of a process that starts the database;
