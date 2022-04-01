@@ -1,0 +1,29 @@
+The algorithm of the database recovery script
+------------------------------------------------------
+Changeable parameters:
+--codid
+The data type is a dictionary.
+Data - Data Center ID: Data Center Name
+--codename
+The data type is a dictionary.
+Data - data center name: list of IP addresses of data center storages
+--domain
+The data type is a dictionary.
+Data - domain: list of IP addresses of domain stores
+--vipcluster
+The data type is a dictionary.
+Data - virtual IP address of the cluster master node: list of servers included in the cluster
+
+Script algorithm
+The algorithm of the “backup.py” script:
+1.	check for the existence of the backupdb.log log file. If not, create a file. File size check. If the size equal to 1 GB is reached, the file is cleared;
+2.	checking network availability via ICMP protocol of servers with backup storages;
+3.	determination of available IP addresses of servers with backup storages and segments/data centers in which they are located;
+4.	Checking the availability of backup storages via the SMB protocol. Mounting a network resource if the share is not mounted;
+5.	determination of mount points of available storages;
+6.	checking the presence of a reserved server in the dictionary of servers included in database clusters;
+7.	if the server is part of the database cluster, the status of the corosync and pacemaker services is checked, as well as the presence of a process that starts the database;
+8.	if the server is not part of the database cluster, the status of the postgresql service is checked;
+9.	creating a backup archive and a WAL file archive;
+10.	if several storages are available, replication (copying a backup copy) is performed to the storages of other data centers;
+11.	If the number of copies in the vaults is not the same, the backup copies of the vaults are synchronized.
