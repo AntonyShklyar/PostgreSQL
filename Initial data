@@ -53,15 +53,14 @@ Configuring access to the network directory on the redundant server/
 You need to do the following:
 •	create directory /mnt/dbbackup/"Data Center name"/"FQDN of redundant server"
 •	create the directory /opt/creds/ and the file CredIZ"Data center name".txt
-File contents:
-username="user who is allowed to access the share"
-password="user password"
-domain="name of server with backup storage"
+  File contents:
+  username="user who is allowed to access the share"
+  password="user password"
+  domain="name of server with backup storage"
 •	set permissions with commands:
-sudo chmod -R 600 /opt/creds
-sudo chown -R root /opt/creds
+  sudo chmod -R 600 /opt/creds
+  sudo chown -R root /opt/creds
 •	in the /etc/fstab file, add the line //IP address of the server with the backup storage/bkp/dbbackup/"Data center name"/"FQDN of the redundant server" /mnt/dbbackup/"Data center name"/"FQDN of the redundant server" cifs credentials=/opt/creds/CredIZ"Data Center Name".txt
-
 
 Versions:
 •	Python version - 2.7.13
