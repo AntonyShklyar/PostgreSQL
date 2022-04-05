@@ -19,6 +19,7 @@ For each segment of the data center, 1 server for storing backups is allocated. 
 •	internal segment - 10.111.16.54, 10.111.16.63
 •	isolated segment - 10.111.17.54, 10.111.17.63
 The IP addresses of the backup storage servers can be added to the "domain" dictionary of the «backup.py» and «restore.py» files.
+One of the cluster servers is a master node (a node to which read and write accesses are allowed, and to which a clustered IP address is assigned), the other three are slaves (read-only access is allowed to them). Streaming replication is configured between the cluster nodes, which allows you to synchronize the contents of the slave node database with the master node.
 In each segment, a DBMS cluster is deployed, which includes the database servers of the OCOD and RCOD. 3 PostgreSQL DBMS clusters.
 The following is the correspondence between the cluster servers and the virtual IP address of the cluster:
 •	bd1iz01.ac.com, bd1iz02.ac.com, bd2iz01.ac.com, bd2iz02.ac.com - 10.111.15.80
