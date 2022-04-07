@@ -417,6 +417,5 @@ def main():
             for i in range(2): search(path, i)
         else:
             search(path, 0)
-    #Parallel execution of file synchronization operations
 if __name__ == '__main__':
     main()
