@@ -48,8 +48,8 @@ Setting up a backup storage
 Create a directory on the file server where backups will be stored: .../bkp/dbbackup/"Data Center Name"/"FQDN of the backed up server"
 To configure access to the network directory, you need to specify the following parameters in the /etc/samba/smb.conf file:
 •	user who is allowed to access the share (valid users)
-•	mask of directory permissions (create mask) - 0660
-•	directory permissions mask (directory mask) - 0770
+•	mask of directory permissions (create mask) - 0775
+•	directory permissions mask (directory mask) - 0775
 Configuring access to the network directory on the redundant server/
 You need to do the following:
 •	create directory /mnt/dbbackup/"Data Center name"/"FQDN of redundant server"
@@ -61,7 +61,7 @@ You need to do the following:
 •	set permissions with commands:
     sudo chmod -R 600 /opt/creds
     sudo chown -R root /opt/creds
-•	in the /etc/fstab file, add the line //IP address of the server with the backup storage/bkp/dbbackup/"Data center name"/"FQDN of the redundant server" /mnt/dbbackup/"Data center name"/"FQDN of the redundant server" cifs credentials=/opt/creds/CredIZ"Data Center Name".txt
+•	in the /etc/fstab file, add the line //IP address of the server with the backup storage/bkp/dbbackup/"Data center name"/"FQDN of the redundant server" /mnt/dbbackup/"Data center name"/"FQDN of the redundant server" cifs credentials=/opt/creds/CredIZ"Data Center Name".txt,rw,file_mode=0666,dir_mode=0777
 
 Versions:
 •	Python version - 2.7.13
