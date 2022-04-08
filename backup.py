@@ -416,6 +416,8 @@ def main():
             replication(path, copy, copywal)
             for i in range(2): search(path, i)
         else:
+	    copy = backup(path[0], t)
+	    replication(path, copy)
             search(path, 0)
 if __name__ == '__main__':
     main()
