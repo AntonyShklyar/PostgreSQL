@@ -1,30 +1,5 @@
 #!/usr/bin/python
 
-'''
-For Python 2.7.13
-
-BD clusters:
-    	bd1iz01.ac.com
-        bd1iz02.ac.com
-        bd2iz01.ac.com
-        bd2iz02.ac.com
-        and
-        crsvn01.vp.com
-        crsvn02.vp.com
-        and
-        crsin01.in.com
-        crsin02.in.com
-
-        Data centers:
-        01 - OCOD
-        02 - RCOD
-
-        Domaines:
-        ac.com
-        vp.com
-        in.com
-'''
-
 import os
 import shutil
 import socket
