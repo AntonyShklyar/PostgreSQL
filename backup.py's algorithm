@@ -26,4 +26,4 @@ The algorithm of the “backup.py” script:
 8.	if the server is not part of the database cluster, the status of the postgresql service is checked;
 9.	creating a backup archive and a WAL file archive;
 10.	if several storages are available, replication (copying a backup copy) is performed to the storages of other data centers;
-11.	If the number of copies in the vaults is not the same, the backup copies of the vaults are synchronized. Synchronization is done using the multiprocessing module (uses 2 processors - can be changed)
+11.	If the number of copies in the vaults is not the same, the backup copies of the vaults are synchronized. Synchronization is done using the package, that supports spawning processes using an API - "multiprocessing" module (uses 2 processors - can be changed)
