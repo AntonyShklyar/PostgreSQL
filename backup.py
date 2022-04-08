@@ -204,7 +204,7 @@ def main():
         	    pool.terminate()
         if d==0:
 	    m=list((submassive(a, processors)))
-            syncronize(path1, path2, a)
+            syncronize(path1, path2, m)
             return 0
         #Copying backups from a vault with more copies to a vault with fewer copies
         w=len(b)
