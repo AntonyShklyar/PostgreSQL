@@ -18,7 +18,7 @@ import math
 def main():
     def logs():
 	'''Creating a session log and a log with a description of all sessions'''
-	#If the size of 1 GB is exceeded, the debugdb.log is deleted and recreated
+	#If the size of 1 GB is exceeded, the backupdb.log is deleted and recreated
 	if not os.path.exists('/var/log/backupdb.log'): f=open('/var/log/backupdb.log', "w+"); f.close()
 	if not os.path.getsize('/var/log/backupdb.log')/(1024*1024*1024)==0: os.system(r' >/var/log/backupdb.log')
 	#The function returns 0
