@@ -356,7 +356,7 @@ def main():
         '''
         '''
     Editable parameters:
-    --codd
+    --codid
     The data type is a dictionary.
     Data - Data Center ID: Data Center Name
     --codname
