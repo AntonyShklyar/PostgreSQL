@@ -183,7 +183,6 @@ def main():
             return 0
         #Copying backups from a vault with more copies to a vault with fewer copies
         w=len(b)
-        z=len(a)
         temp=[]
         for k in b:
             temp.append(k)
