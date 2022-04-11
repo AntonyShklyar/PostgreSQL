@@ -6,7 +6,7 @@ Structurally, the system consists of the following segments: 3 network segments:
 •	internal (vp.com)
 •	isolated (ac.com)
 Segments can be added in the "domain" dictionary of «backup.py» and «restore.py» files.
-The fault tolerance of the segments is ensured by the presence of a main data center (OCOD) and reserve data centers COD accepts connections in the event of a failure of the hardware and/or software of the main data center.
+The fault tolerance of the segments is ensured by the presence of a main data center (OCOD) and reserve data centers - RCOD and GCOD. RCOD and GCOD accepts connections in the event of a failure of the hardware and/or software of the main data center.
 2 data centers:
 •	OCOD (01)
 •	RCOD (02)
@@ -15,7 +15,7 @@ Data center names and their numeric identifiers can be added to the "codid" and 
 All segments operate within the same data center. The interaction of technical means between segments is excluded.
 The interaction of technical means between data centers within the same segment is allowed.
 The belonging of a server to a segment/data center can be determined by the domain name/number that is in the FQDN name of each server (should be written in /etc/hostname). For example, the server bd1iz01.ac.com belongs to an isolated segment of the main data center.
-For each segment of the data center, 1 server for storing backups is allocated. A total of 6 storage servers (2 in each segment - one in the OCOD and the other in the RCOD)
+For each segment of the data center, 1 server for storing backups is allocated. A total of 9 storage servers (3 in each segment - one in the OCOD and the other in the RCOD)
 •	outer segment - 10.111.15.54, 10.111.15.63, 10.111.17.72
 •	internal segment - 10.111.16.54, 10.111.16.63, 10.111.17.72
 •	isolated segment - 10.111.17.54, 10.111.17.63, 10.111.17.72
