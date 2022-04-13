@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 '''
-For Python 2.7.13
+Tested on Python versions 2.7.13 and 3.5.3 
 
 BD clusters:
     	bd1iz01.ac.com
