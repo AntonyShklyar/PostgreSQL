@@ -432,6 +432,5 @@ def main():
             copy = backup(path[0], t)
             replication(path, copy)
             search(path, 0)
-    #Parallel execution of file synchronization operations
 if __name__ == '__main__':
     main()
