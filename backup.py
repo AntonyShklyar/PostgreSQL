@@ -42,17 +42,10 @@ import math
 
 def main():
     def logs():
-<<<<<<< HEAD
-        '''Creating a session log and a log with a description of all sessions'''
-	#If the size of 1 GB is exceeded, the debugdb.log is deleted and recreated
-        if not os.path.exists('/var/log/backupdb.log'): f=open('/var/log/backupdb.log', "w+"); f.close()
-        if not os.path.getsize('/var/log/backupdb.log')/(1024*1024*1024)==0: os.system(r' >/var/log/backupdb.log')
-=======
 	'''Creating a session log and a log with a description of all sessions'''
 	#If the size of 1 GB is exceeded, the backupdb.log is deleted and recreated
 	if not os.path.exists('/var/log/backupdb.log'): f=open('/var/log/backupdb.log', "w+"); f.close()
 	if not os.path.getsize('/var/log/backupdb.log')/(1024*1024*1024)==0: os.system(r' >/var/log/backupdb.log')
->>>>>>> b53632bebc079843d2d8c7aee13bd0afdb549d44
 	#The function returns 0
     def cluster(vipcluster, a):
         '''Determining if a given server belongs to a DB cluster'''
@@ -163,7 +156,7 @@ def main():
                                 os.mkdir('/var/lib/postgresql/wal_archive/') 
                                 uid = pwd.getpwnam("postgres").pw_uid 
                                 os.chown('/var/lib/postgresql/wal_archive/', uid, -1)
-                                os.system('sleep 1s')
+                                os.system('sleep 15m')
                                 shutil.rmtree('/tmp/wal', ignore_errors=True)
                                 os.mkdir('/tmp/wal')
 				#Search and collection of WAL-files, created during the time specified in the variable "TIME'
@@ -208,6 +201,7 @@ def main():
                 each_chunk = a[x: n+x]
                 yield each_chunk
         def syncronize(path1, path2, m):
+            #Parallel execution of file synchronization operations
             with closing(Pool(processors)) as pool:
                 for i in m:
                     try:
@@ -219,13 +213,6 @@ def main():
             syncronize(path1, path2, m)
             return 0
         #Copying backups from a vault with more copies to a vault with fewer copies
-<<<<<<< HEAD
-=======
-        w=len(b)
-        temp=[]
-        for k in b:
-            temp.append(k)
->>>>>>> b53632bebc079843d2d8c7aee13bd0afdb549d44
         s=[]
         temp=[]
         for i in b:
