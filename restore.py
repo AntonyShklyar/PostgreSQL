@@ -20,7 +20,10 @@ def main():
             f.close()
         if not os.path.getsize('/var/log/backupdb.log') / (1024*1024*1024) == 0:
             os.system(r' >/var/log/backupdb.log')
-        #The function returns 0
+        '''
+        Output data:
+        the function returns 0
+        '''
     def paths(a, domain, codname, codid):
         '''Determining the backup storage mount point'''
         d = {}
@@ -49,7 +52,14 @@ def main():
         e = mounts(s, dic)	
         return e, len(e)
         '''
-        The returned data type is a list (Storage mount point) and count of storage mount point
+        Input data:
+        a - data type is a string - FQDN-name of server
+        domain - data type is a dict - domain: list of IP addresses of domain stores
+        codname - data type is a dict - list of IP addresses of data center storages
+        codid - data type is a dict - Data Center ID: Data Center Name
+        Output data:
+        e - data type is a list - Storage mount point
+        len(e) - data type is a number - count of storage mount
         '''
     def mounts(s, dic):
         '''Checking if the ball is mounted'''
@@ -113,9 +123,11 @@ def main():
                                         e.append(t)
                                         return e
         '''
-        Return data type - massive/number
-        If the function returns e (path to storage mount point), the storage is available
-        If the function returns 1, the storage is not available
+        Input data:
+        s - data type is dict - name: array of IP-addresses of each data center
+        dic - data type is dict - IP-address of data center: massive of mount point
+        Output data:
+        e - data type is a list - path to storage mount point: available mount point
         '''
     def networkavailable(d, codname):
         '''Determining the network availability of storage'''
@@ -153,11 +165,15 @@ def main():
             exit()
         return s
         '''
-        Return data type - dictionary
-        Data - ta center name and array of IP-addresses of each data center.
+        Input data:
+        d - data type is dict - the domain, that the server belongs to: list of IP addresses of domain stores
+        codname - data type is a dict - list of IP addresses of data center storages
+        Output data:
+        s - data type is dict - name and array of IP-addresses of each data center
         If all servers with a backup storage are unavailable, the program will close
         '''
     def cluster(vipcluster, a):
+	'''Determining if a given server belongs to a DB cluster'''
         for i, j in vipcluster.items():
             for k in j:
                 if a in k:
@@ -165,6 +181,14 @@ def main():
                     return IP
                 else:
                     return 1
+	'''
+        Input data:
+        vipcluster - data type is a dict - cluster virtual IP: cluster server name.
+        a - data type is a string - FQDN-name of server
+        Output data:
+        If the server is part of a cluster, the cluster's IP address is returned.
+        Otherwise the function returns 1
+        '''
     def restore(path, t, IP):
         '''Restoring from a backup'''
         if t == 1:
@@ -238,6 +262,13 @@ def main():
         subprocess.call(["tar", "-C", "/var/lib/postgresql/9.6/main/", "-xvf", bddata])
         os.system('systemctl start postgresql')
         '''
+	Input data:
+	path - data type is a list - Storage mount point
+	t - data type is a number:
+        1 - the server is part of a cluster
+        0 - the server is not part of the cluster
+	IP - data type is a string - if the servir is part of a cluster - virtual IP-address of a cluster, else - 1
+	Output data: 
         Return data types - None
         '''
     def inputdata(path, t, IP):
@@ -254,6 +285,13 @@ def main():
             print('Invalid value entered. Try again')
             inputdata(path, t, IP)
         '''
+	Input data:
+        path - data type is a list - Storage mount point
+        t - data type is a number:
+        1 - the server is part of a cluster
+        0 - the server is not part of the cluster
+        IP - data type is a string - if the servir is part of a cluster - virtual IP-address of a cluster, else - 1
+        Output data:
         Return data types - None
         '''
     '''
