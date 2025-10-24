@@ -26,7 +26,7 @@ massive()
         IPVP=(10.111.23.101 10.111.25.101)
         IPIN=(10.111.33.66 10.111.35.162)
         IP=()
-        if [[ $(hostname | grep vn) ]]
+        if [[ $(hostname | grep vp) ]]
         then
                 for t in ${IPVP[@]}; do
                         IP+=($t)
