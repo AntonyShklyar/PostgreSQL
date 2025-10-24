@@ -502,7 +502,7 @@ def main():
     codid = {'01': 'OCOD', '02': 'RCOD', '03': 'GCOD'}
     codname = {'OCOD': ['10.111.15.54', '10.111.16.54', '10.111.17.54'], 'RCOD': ['10.111.15.63', '10.111.16.63', '10.111.17.63'], 'GCOD': ['10.111.15.75', '10.111.16.75', '10.111.17.75']}
     domain = {'ac.com': ['10.111.15.54', '10.111.15.63', '10.111.15.75'], 'vp.com': ['10.111.16.54', '10.111.16.63', '10.111.16.75'], 'in.com': ['10.111.17.54', '10.111.17.63', '10.111.17.75']}
-    vipcluster = {'10.111.15.80': ['crs1vn.win.cbr.ru','bd1iz01.ac.com', 'bd1iz02.ac.com', 'bd2iz01.ac.com', 'bd2iz02.ac.com'], '10.111.16.80': ['crsvn01.vp.com', 'crsvn02.vp.com'], '10.111.17.80': ['crsin01.in.com', 'crsin02.in.com']}
+    vipcluster = {'10.111.15.80': ['bd1iz01.ac.com', 'bd1iz02.ac.com', 'bd2iz01.ac.com', 'bd2iz02.ac.com'], '10.111.16.80': ['crsvn01.vp.com', 'crsvn02.vp.com'], '10.111.17.80': ['crsin01.in.com', 'crsin02.in.com']}
     a = socket.gethostname()
     logs()
     path,n = paths(a, domain, codname, codid)
