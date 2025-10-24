@@ -7,13 +7,13 @@
 
 :<<end_of_comments
 BD clusters:
-s39bd1iz01.iz.com
-s39bd1iz02.iz.com
-s39bd2iz01.iz.com
-s39bd2iz02.iz.com
+bd1iz01.ac.com
+bd1iz02.ac.com
+bd2iz01.ac.com
+bd2iz02.ac.com
 and
-s39crsvn01.vn.com
-s39crsvn02.vn.com
+s39crsvn01.vp.com
+s39crsvn02.vp.com
 and
 s39crsin01.in.com 
 s39crsin02.in.com
@@ -44,23 +44,23 @@ massive()
 	local -n IP=$1
 	if [[ $(hostname | grep 01) ]]
 	then	
-        	IPIZ=(10.111.13.178 10.111.15.178)
-        	IPVN=(10.111.23.101 10.149.25.101)
+        	IPAC=(10.111.13.178 10.111.15.178)
+        	IPVP=(10.111.23.101 10.111.25.101)
         	IPIN=(10.111.33.66 10.111.35.162)
 	elif [[ $(hostname | grep 02) ]]
 	then
-		IPIZ=(10.111.15.178 10.111.13.178)
-       		IPVN=(10.149.25.101 10.111.23.101)
+		IPAC=(10.111.15.178 10.111.13.178)
+       		IPVP=(10.149.25.101 10.111.23.101)
       		IPIN=(10.111.35.162 10.111.33.66)
 	fi
         IP=()
-        if [[ $(hostname | grep vn) ]]
+        if [[ $(hostname | grep vp) ]]
         then
-                for t in ${IPVN[@]}; do
+                for t in ${IPVP[@]}; do
                         IP+=($t)
                 done
-        elif [[ $(hostname | grep iz) ]]; then
-                for t in ${IPIZ[@]}; do
+        elif [[ $(hostname | grep ac) ]]; then
+                for t in ${IPAC[@]}; do
                         IP+=($t)
                 done
         else
@@ -93,7 +93,7 @@ backup()
 		rm -f $path/base.tar.gz
 	fi
 	#Determining an array of IP-addresses of servers with database clusters
-	IP=(s39bd1iz01.iz.com s39bd1iz02.iz.com s39bd2iz01.iz.com s39bd2iz02.iz.com s39crsvn01.vn.com s39crsvn02.vn.com s39crsin01.in.com s39crsin02.in.com)
+	IP=(bd1iz01.ac.com bd1iz02.ac.com bd2iz01.ac.com bd2iz02.ac.com crsvn01.vp.com crsvn02.vp.com crsin01.in.com crsin02.in.com)
 	a=$(uname -n)
 	m=0
 	for i in ${IP[@]}
