@@ -4,13 +4,13 @@
 
 :<<end_of_comments
 BD clusters:
-s39bd1iz01.iz.com
-s39bd1iz02.iz.com
-s39bd2iz01.iz.com
-s39bd2iz02.iz.com
+bd1iz01.ac.com
+bd1iz02.ac.com
+bd2iz01.ac.com
+bd2iz02.ac.com
 and
-s39crsvn01.vn.com
-s39crsvn02.vn.com
+s39crsvn01.vp.com
+s39crsvn02.vp.com
 and
 s39crsin01.in.com 
 s39crsin02.in.com
@@ -22,17 +22,17 @@ end_of_comments
 massive()
 {
         local -n IP=$1
-	IPIZ=(10.111.13.178 10.111.15.178)
-        IPVN=(10.111.23.101 10.149.25.101)
+	IPAC=(10.111.13.178 10.111.15.178)
+        IPVP=(10.111.23.101 10.111.25.101)
         IPIN=(10.111.33.66 10.111.35.162)
         IP=()
         if [[ $(hostname | grep vn) ]]
         then
-                for t in ${IPVN[@]}; do
+                for t in ${IPVP[@]}; do
                         IP+=($t)
                 done
-        elif [[ $(hostname | grep iz) ]]; then
-                for t in ${IPIZ[@]}; do
+        elif [[ $(hostname | grep ac) ]]; then
+                for t in ${IPAC[@]}; do
                         IP+=($t)
                 done
         else
@@ -90,38 +90,38 @@ checkcopy()
 restore()
 {
 	if [[ ($(uname -n | grep bd) && ($? -eq 0)) && ($2 -eq 1) ]]; then
-                path1='/mnt/dbbackup/OCOD/s39bd1iz01.iz.com'
-                path2='/mnt/dbbackup/OCOD/s39bd2iz01.iz.com'
+                path1='/mnt/dbbackup/OCOD/bd1iz01.ac.com'
+                path2='/mnt/dbbackup/OCOD/bd2iz01.ac.com'
                 checkcopy $path1 $path2 bddata
         elif [[ ($(uname -n | grep bd) && ($? -eq 0)) && ($2 -eq 2) ]]; then
-                path1='/mnt/dbbackup/OCOD/s39bd1iz01.iz.com'
-                path2='/mnt/dbbackup/OCOD/s39bd2iz01.iz.com'
-                path3='/mnt/dbbackup/RCOD/s39bd1iz02.iz.com'
-                path4='/mnt/dbbackup/RCOD/s39bd2iz02.iz.com'
+                path1='/mnt/dbbackup/OCOD/bd1iz01.ac.com'
+                path2='/mnt/dbbackup/OCOD/bd2iz01.ac.com'
+                path3='/mnt/dbbackup/RCOD/bd1iz02.ac.com'
+                path4='/mnt/dbbackup/RCOD/bd2iz02.ac.com'
                 checkcopy $path1 $path2 $path3 $path4 bddata
         elif [[ ($(uname -n | grep bd) && ($? -eq 0)) && ($2 -eq 3) ]]; then
-                path1='/mnt/dbbackup/RCOD/s39bd1iz02.iz.com'
-                path2='/mnt/dbbackup/RCOD/s39bd2iz02.iz.com'
+                path1='/mnt/dbbackup/RCOD/bd1iz02.iz.com'
+                path2='/mnt/dbbackup/RCOD/bd2iz02.iz.com'
                 checkcopy $path1 $path2 bddata
         elif [[ ($(uname -n | grep crsin) && ($? -eq 0)) && ($2 -eq 1) ]]; then
-                path1='/mnt/dbbackup/OCOD/s39crsin01.in.com'
+                path1='/mnt/dbbackup/OCOD/crsin01.in.com'
                 checkcopy $path1 bddata
         elif [[ ($(uname -n | grep crsin) && ($? -eq 0)) && ($2 -eq 2) ]]; then
-                path1='/mnt/dbbackup/OCOD/s39crsin01.in.com'
-                path2='/mnt/dbbackup/RCOD/s39crsin02.in.com'
+                path1='/mnt/dbbackup/OCOD/crsin01.in.com'
+                path2='/mnt/dbbackup/RCOD/crsin02.in.com'
                 checkcopy $path1 $path2 bddata
         elif [[ ($(uname -n | grep crsin) && ($? -eq 0)) && ($2 -eq 3) ]]; then
-                path1='/mnt/dbbackup/RCOD/s39crsin02.in.com'
+                path1='/mnt/dbbackup/RCOD/crsin02.in.com'
                 checkcopy path1 bddata
         elif [[ ($(uname -n | grep crsvn) && ($? -eq 0)) && ($2 -eq 1) ]]; then
-                path1='/mnt/dbbackup/OCOD/s39crsvn01.vn.com'
+                path1='/mnt/dbbackup/OCOD/crsvn01.vp.com'
                 checkcopy path1 bddata
         elif [[ ($(uname -n | grep crsvn) && ($? -eq 0)) && ($2 -eq 2) ]]; then
-                path1='/mnt/dbbackup/OCOD/s39crsvn01.vn.com'
-                path2='/mnt/dbbackup/RCOD/s39crsvn02.vn.com'
+                path1='/mnt/dbbackup/OCOD/crsvn01.vp.com'
+                path2='/mnt/dbbackup/RCOD/crsvn02.vp.com'
                 checkcopy $path1 $path2 bddata
         elif [[ ($(uname -n | grep crsvn) && ($? -eq 0)) && ($2 -eq 3) ]]; then
-                path1='/mnt/dbbackup/RCOD/s39crsvn02.vn.com'
+                path1='/mnt/dbbackup/RCOD/crsvn02.vp.com'
                 checkcopy $path1 bddata
         elif [[ ($(uname -n | grep crs) && ($? -eq 1)) && ($(uname -n | grep bd) && ($? -eq 1)) && ($1 -eq 1) ]]; then
                 path1='/mnt/dbbackup/OCOD'
@@ -169,13 +169,13 @@ mountavailable()
         a=$(uname -n)
         if [[ $a == $(uname -n | grep crsin) ]]; then
                 OCOD=/mnt/dbbackup/OCOD/$a
-                RCOD=/mnt/dbbackup/RCOD/s39crsin02.in.com
+                RCOD=/mnt/dbbackup/RCOD/crsin02.in.com
         elif [[ $a == $(uname -n | grep crsvn) ]]; then
                 OCOD=/mnt/dbbackup/OCOD/$a
-                RCOD=/mnt/dbbackup/RCOD/s39crsvn02.vn.com
+                RCOD=/mnt/dbbackup/RCOD/crsvn02.vp.com
         elif [[ $a == $(uname -n | grep bd) ]]; then
                 OCOD=/mnt/dbbackup/OCOD/$a
-                RCOD=/mnt/dbbackup/RCOD/s39bd1iz02.iz.com
+                RCOD=/mnt/dbbackup/RCOD/bd1iz02.ac.com
         else
                 OCOD=/mnt/dbbackup/OCOD/
                 RCOD=/mnt/dbbackup/RCOD/
